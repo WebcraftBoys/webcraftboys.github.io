@@ -433,7 +433,7 @@ Keep the /exec at the end.
 */
 
 const GOOGLE_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbwYpb0O9sbxglGrC2GyXXCkPn4Siflbq2LrM3-U8zGIPbaaPJtcOFFW3lh5wyuU_Jr-uA/exec";
+"https://script.google.com/macros/s/AKfycbxnPxXWG7CESvMxOf7QZ1gn8zB4vmKKw390z8dieDJRwqvxhgHgzSna5Y3k-icCr0J-cg/exec";
 
 
 /* =========================================================
