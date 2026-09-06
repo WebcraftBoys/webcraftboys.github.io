@@ -368,253 +368,290 @@ document.addEventListener("keydown", event => {
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxzBsIdFDmSS5gu2lh3thPUs-Fc9i3o4M0CHKxcjVG3D4rdWzAKedsTBKOv5Sm8uORcRA/exec";
 
-
 /* =========================================================
-   CONTACT FORM
-   ========================================================= */
+CONTACT FORM
+========================================================= */
 
 const contactForm = $("#contactForm");
 const formMessage = $("#formMessage");
 
 
+/* =========================================================
+FORM MESSAGE
+========================================================= */
+
 function setFormMessage(message = "", type = "") {
 
-  if (!formMessage) return;
+if (!formMessage) return;
 
-  formMessage.textContent = message;
+formMessage.textContent = message;
 
-  formMessage.classList.remove(
-    "success",
-    "error"
-  );
+formMessage.classList.remove(
+ "success",
+ "error"
+);
 
-  if (type) {
-    formMessage.classList.add(type);
-  }
+if (type) {
+ formMessage.classList.add(type);
+}
 }
 
 
+/* =========================================================
+CONTACT FORM SUBMISSION
+========================================================= */
+
 if (contactForm) {
 
-  contactForm.addEventListener(
-    "submit",
-    async (event) => {
+contactForm.addEventListener(
+ "submit",
+ async (event) => {
 
-      event.preventDefault();
+   event.preventDefault();
 
-      const submitButton =
-        contactForm.querySelector(
-          'button[type="submit"]'
-        );
 
-      if (!submitButton) return;
+   /* -----------------------------------------------------
+      Submit button
+      ----------------------------------------------------- */
 
+   const submitButton =
+     contactForm.querySelector(
+       'button[type="submit"]'
+     );
 
-      // Browser validation
-      if (!contactForm.checkValidity()) {
+   if (!submitButton) return;
 
-        contactForm.reportValidity();
 
-        return;
-      }
+   /* -----------------------------------------------------
+      Browser validation
+      ----------------------------------------------------- */
 
+   if (!contactForm.checkValidity()) {
 
-      const originalButtonHTML =
-        submitButton.innerHTML;
+     contactForm.reportValidity();
 
+     return;
+   }
 
-      // Loading
-      submitButton.disabled = true;
 
-      submitButton.innerHTML =
-        'Sending enquiry <span>…</span>';
+   /* -----------------------------------------------------
+      Save original button
+      ----------------------------------------------------- */
 
-      setFormMessage();
+   const originalButtonHTML =
+     submitButton.innerHTML;
 
 
-      // Collect form data
-      const formData =
-        new FormData(contactForm);
+   /* -----------------------------------------------------
+      Loading state
+      ----------------------------------------------------- */
 
+   submitButton.disabled = true;
 
-      const submission =
-        new URLSearchParams();
+   submitButton.innerHTML =
+     'Sending enquiry <span>…</span>';
 
+   setFormMessage();
 
-      submission.append(
-        "name",
-        String(
-          formData.get("name") || ""
-        ).trim()
-      );
 
-      submission.append(
-        "email",
-        String(
-          formData.get("email") || ""
-        ).trim()
-      );
+   /* -----------------------------------------------------
+      Collect form data
+      ----------------------------------------------------- */
 
-      submission.append(
-        "goal",
-        String(
-          formData.get("goal") || ""
-        ).trim()
-      );
+   const formData =
+     new FormData(contactForm);
 
-      submission.append(
-        "budget",
-        String(
-          formData.get("budget") || ""
-        ).trim()
-      );
 
-      submission.append(
-        "timeline",
-        String(
-          formData.get("timeline") || ""
-        ).trim()
-      );
+   const submission =
+     new URLSearchParams();
 
-      submission.append(
-        "message",
-        String(
-          formData.get("message") || ""
-        ).trim()
-      );
 
+   submission.append(
+     "name",
+     String(
+       formData.get("name") || ""
+     ).trim()
+   );
 
-      try {
+   submission.append(
+     "email",
+     String(
+       formData.get("email") || ""
+     ).trim()
+   );
 
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT use no-cors here.
-         */
+   submission.append(
+     "goal",
+     String(
+       formData.get("goal") || ""
+     ).trim()
+   );
 
-        const response =
-          await fetch(
-            GOOGLE_SCRIPT_URL,
-            {
-              method: "POST",
+   submission.append(
+     "budget",
+     String(
+       formData.get("budget") || ""
+     ).trim()
+   );
 
-              headers: {
-                "Content-Type":
-                  "application/x-www-form-urlencoded;charset=UTF-8"
-              },
+   submission.append(
+     "timeline",
+     String(
+       formData.get("timeline") || ""
+     ).trim()
+   );
 
-              body: submission.toString()
-            }
-          );
+   submission.append(
+     "message",
+     String(
+       formData.get("message") || ""
+     ).trim()
+   );
 
 
-        if (!response.ok) {
-          throw new Error(
-            "Server returned HTTP " +
-            response.status
-          );
-        }
+   /* -----------------------------------------------------
+      Extra validation
+      ----------------------------------------------------- */
 
+   const name =
+     String(formData.get("name") || "").trim();
 
-        const responseText =
-          await response.text();
+   const email =
+     String(formData.get("email") || "").trim();
 
+   const goal =
+     String(formData.get("goal") || "").trim();
 
-        console.log(
-          "Apps Script response:",
-          responseText
-        );
+   const message =
+     String(formData.get("message") || "").trim();
 
 
-        let result;
+   if (
+     !name ||
+     !email ||
+     !goal ||
+     !message
+   ) {
 
-        try {
+     setFormMessage(
+       "Please complete all required fields.",
+       "error"
+     );
 
-          result =
-            JSON.parse(responseText);
+     submitButton.disabled = false;
 
-        } catch {
+     submitButton.innerHTML =
+       originalButtonHTML;
 
-          throw new Error(
-            "Invalid response from Google Apps Script."
-          );
+     return;
+   }
 
-        }
 
+   /* -----------------------------------------------------
+      SEND TO GOOGLE APPS SCRIPT
+      ----------------------------------------------------- */
 
-        if (
-          !result ||
-          result.success !== true
-        ) {
+   try {
 
-          throw new Error(
-            result?.error ||
-            "Google Apps Script rejected the enquiry."
-          );
+     /*
+      * IMPORTANT:
+      *
+      * We intentionally use no-cors.
+      *
+      * Google Apps Script Web Apps are cross-origin.
+      * no-cors allows the browser to send the POST
+      * without the browser blocking the request.
+      *
+      * DO NOT add a Content-Type header here.
+      */
 
-        }
+     await fetch(
+       GOOGLE_SCRIPT_URL,
+       {
+         method: "POST",
+         mode: "no-cors",
+         body: submission
+       }
+     );
 
 
-        // =========================
-        // SUCCESS
-        // =========================
+     /*
+      * With no-cors, the browser cannot read Google's
+      * response. However, if fetch completes without
+      * throwing a network error, the POST was sent.
+      */
 
-        contactForm.reset();
 
+     /* ---------------------------------------------------
+        SUCCESS
+        --------------------------------------------------- */
 
-        if (typeof resetPlanner === "function") {
-          resetPlanner();
-        }
+     contactForm.reset();
 
 
-        setFormMessage(
-          "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
-          "success"
-        );
+     // Reset planner
+     if (
+       typeof resetPlanner === "function"
+     ) {
 
+       resetPlanner();
 
-        if (typeof showToast === "function") {
+     }
 
-          showToast(
-            "Project enquiry sent successfully."
-          );
 
-        }
+     setFormMessage(
+       "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
+       "success"
+     );
 
 
-      } catch (error) {
+     if (
+       typeof showToast === "function"
+     ) {
 
-        console.error(
-          "Webcraft form error:",
-          error
-        );
+       showToast(
+         "Project enquiry sent successfully."
+       );
 
+     }
 
-        setFormMessage(
-          "We couldn't send your enquiry right now. Please try again.",
-          "error"
-        );
 
+   } catch (error) {
 
-        if (typeof showToast === "function") {
+     console.error(
+       "Webcraft form error:",
+       error
+     );
 
-          showToast(
-            "Unable to send enquiry."
-          );
 
-        }
+     setFormMessage(
+       "We couldn't send your enquiry right now. Please try again.",
+       "error"
+     );
 
-      } finally {
 
-        submitButton.disabled = false;
+     if (
+       typeof showToast === "function"
+     ) {
 
-        submitButton.innerHTML =
-          originalButtonHTML;
+       showToast(
+         "Unable to send enquiry."
+       );
 
-      }
+     }
 
-    }
-  );
+
+   } finally {
+
+     submitButton.disabled = false;
+
+     submitButton.innerHTML =
+       originalButtonHTML;
+
+   }
+
+ }
+);
 
 }
 /* =========================================================
