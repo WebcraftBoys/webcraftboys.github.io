@@ -366,7 +366,7 @@ document.addEventListener("keydown", event => {
    ========================================================= */
 
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzg0WaVNhj0a-2WgIe3JLodHkXj-x-f6GA9duvootqGRjpETwgC2f7xnbi8Psp4e67YCg/exec";
+  "https://script.google.com/macros/s/AKfycbxzBsIdFDmSS5gu2lh3thPUs-Fc9i3o4M0CHKxcjVG3D4rdWzAKedsTBKOv5Sm8uORcRA/exec";
 
 
 /* =========================================================
