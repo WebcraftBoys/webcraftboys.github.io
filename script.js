@@ -2,7 +2,7 @@
 
 /* =========================================================
    WEBCRAFT — MAIN JAVASCRIPT
-   Frontend only
+   Frontend interactions
    ========================================================= */
 
 
@@ -29,14 +29,11 @@ function hideLoader() {
   loader.classList.add("hidden");
 }
 
-
-// Normal page-load fallback
 window.addEventListener("load", () => {
   setTimeout(hideLoader, 400);
 });
 
-
-// Absolute safety fallback
+// Safety fallback in case the load event gets stuck.
 setTimeout(hideLoader, 2500);
 
 
@@ -44,13 +41,27 @@ setTimeout(hideLoader, 2500);
    MOBILE NAVIGATION
    ========================================================= */
 
-const menuToggle = $(".menu-toggle");
-const navLinks = $("#navLinks");
+function initMobileNavigation() {
+  const menuToggle = $(".menu-toggle");
+  const navLinks = $("#navLinks");
 
-if (menuToggle && navLinks) {
+  if (!menuToggle || !navLinks) return;
+
+  const closeMenu = () => {
+    navLinks.classList.remove("open");
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      "Open navigation"
+    );
+  };
 
   menuToggle.addEventListener("click", () => {
-
     const isOpen =
       navLinks.classList.toggle("open");
 
@@ -65,31 +76,11 @@ if (menuToggle && navLinks) {
         ? "Close navigation"
         : "Open navigation"
     );
-
   });
 
-
-  // Close menu after clicking a link
   $$(".nav-links a", navLinks).forEach(link => {
-
-    link.addEventListener("click", () => {
-
-      navLinks.classList.remove("open");
-
-      menuToggle.setAttribute(
-        "aria-expanded",
-        "false"
-      );
-
-      menuToggle.setAttribute(
-        "aria-label",
-        "Open navigation"
-      );
-
-    });
-
+    link.addEventListener("click", closeMenu);
   });
-
 }
 
 
@@ -97,43 +88,36 @@ if (menuToggle && navLinks) {
    SCROLL REVEAL
    ========================================================= */
 
-const revealElements = $$(".reveal");
+function initScrollReveal() {
+  const elements = $$(".reveal");
 
-if ("IntersectionObserver" in window) {
+  if (!elements.length) return;
 
-  const revealObserver =
-    new IntersectionObserver(
-      entries => {
+  if (!("IntersectionObserver" in window)) {
+    elements.forEach(element => {
+      element.classList.add("visible");
+    });
 
-        entries.forEach(entry => {
+    return;
+  }
 
-          if (!entry.isIntersecting) return;
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
 
-          entry.target.classList.add("visible");
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    {
+      threshold: 0.12
+    }
+  );
 
-          revealObserver.unobserve(
-            entry.target
-          );
-
-        });
-
-      },
-      {
-        threshold: 0.12
-      }
-    );
-
-
-  revealElements.forEach(element => {
-    revealObserver.observe(element);
+  elements.forEach(element => {
+    observer.observe(element);
   });
-
-} else {
-
-  revealElements.forEach(element => {
-    element.classList.add("visible");
-  });
-
 }
 
 
@@ -141,519 +125,259 @@ if ("IntersectionObserver" in window) {
    PORTFOLIO FILTERS
    ========================================================= */
 
-const filterButtons = $$(".filter");
-const caseCards = $$(".case-card");
+function initPortfolioFilters() {
+  const filterButtons = $$(".filter");
+  const caseCards = $$(".case-card");
 
-filterButtons.forEach(button => {
+  if (!filterButtons.length || !caseCards.length) {
+    return;
+  }
 
-  button.addEventListener("click", () => {
+  filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const selectedFilter =
+        button.dataset.filter || "all";
 
-    const selectedFilter =
-      button.dataset.filter || "all";
+      // Update active filter button.
+      filterButtons.forEach(item => {
+        item.classList.toggle(
+          "active",
+          item === button
+        );
+      });
 
+      // Filter project cards.
+      caseCards.forEach(card => {
+        const category =
+          card.dataset.category || "";
 
-    // Active button
-    filterButtons.forEach(item => {
-      item.classList.remove("active");
+        const shouldHide =
+          selectedFilter !== "all" &&
+          category !== selectedFilter;
+
+        card.classList.toggle(
+          "hidden",
+          shouldHide
+        );
+      });
     });
-
-    button.classList.add("active");
-
-
-    // Filter cards
-    caseCards.forEach(card => {
-
-      const category =
-        card.dataset.category || "";
-
-      const hidden =
-        selectedFilter !== "all" &&
-        category !== selectedFilter;
-
-      card.classList.toggle(
-        "hidden",
-        hidden
-      );
-
-    });
-
   });
-
-});
+}
 
 
 /* =========================================================
    PROJECT PLANNER
    ========================================================= */
 
-const goals = $$(".goal");
-const goalOutput = $("#goalOutput");
-const goalSelect = $("#goalSelect");
-const plannerNext = $("#plannerNext");
+const DEFAULT_GOAL = "New business website";
 
-const DEFAULT_GOAL =
-  "New business website";
+let selectedGoal = DEFAULT_GOAL;
 
 
-function selectGoal(goalButton) {
+function initProjectPlanner() {
+  const goals = $$(".goal");
+  const goalOutput = $("#goalOutput");
+  const goalSelect = $("#goalSelect");
+  const plannerNext = $("#plannerNext");
 
-  if (!goalButton) return;
+  if (!goals.length) return;
 
+  function selectGoal(goalButton) {
+    if (!goalButton) return;
 
-  const selectedGoal =
-    goalButton.dataset.goal || "";
+    const goal =
+      goalButton.dataset.goal?.trim();
 
-  if (!selectedGoal) return;
+    if (!goal) return;
 
+    selectedGoal = goal;
 
-  // Remove active state
+    // Update active goal.
+    goals.forEach(item => {
+      item.classList.toggle(
+        "active",
+        item === goalButton
+      );
+    });
+
+    // Update planner text.
+    if (goalOutput) {
+      goalOutput.textContent = goal;
+    }
+
+    // Sync with contact form.
+    if (goalSelect) {
+      goalSelect.value = goal;
+    }
+  }
+
+  function resetPlanner() {
+    selectedGoal = DEFAULT_GOAL;
+
+    goals.forEach(goal => {
+      goal.classList.remove("active");
+    });
+
+    // Try to find the default goal.
+    const defaultGoal =
+      goals.find(
+        goal =>
+          goal.dataset.goal === DEFAULT_GOAL
+      );
+
+    if (defaultGoal) {
+      selectGoal(defaultGoal);
+      return;
+    }
+
+    // Fallback if the default goal
+    // does not exist in the HTML.
+    if (goalOutput) {
+      goalOutput.textContent =
+        DEFAULT_GOAL;
+    }
+
+    if (goalSelect) {
+      goalSelect.value =
+        DEFAULT_GOAL;
+    }
+  }
+
+  // Make resetPlanner available to the
+  // contact form without polluting the
+  // global scope unnecessarily.
+  window.resetPlanner = resetPlanner;
+
   goals.forEach(goal => {
-    goal.classList.remove("active");
+    goal.addEventListener("click", () => {
+      selectGoal(goal);
+    });
   });
 
+  plannerNext?.addEventListener(
+    "click",
+    () => {
+      const activeGoal =
+        $(".goal.active");
 
-  // Activate selected goal
-  goalButton.classList.add("active");
+      if (activeGoal) {
+        selectGoal(activeGoal);
+      }
+    }
+  );
 
+  // Initialize planner.
+  const initialGoal =
+    $(".goal.active") ||
+    goals.find(
+      goal =>
+        goal.dataset.goal === DEFAULT_GOAL
+    ) ||
+    goals[0];
 
-  // Update planner display
-  if (goalOutput) {
-    goalOutput.textContent =
-      selectedGoal;
+  if (initialGoal) {
+    selectGoal(initialGoal);
   }
-
-
-  // Update contact form
-  if (goalSelect) {
-    goalSelect.value =
-      selectedGoal;
-  }
-
 }
-
-
-// Goal buttons
-goals.forEach(goal => {
-
-  goal.addEventListener("click", () => {
-    selectGoal(goal);
-  });
-
-});
-
-
-// Continue button
-plannerNext?.addEventListener("click", () => {
-
-  const activeGoal =
-    $(".goal.active");
-
-  if (activeGoal) {
-    selectGoal(activeGoal);
-  }
-
-});
 
 
 /* =========================================================
    CASE STUDY MODAL
    ========================================================= */
 
-const modal = $("#caseModal");
-
-const modalTitle = $("#modalTitle");
-const modalDescription = $("#modalDescription");
-const modalResult = $("#modalResult");
-
-
-function openModal(card) {
-
-  if (!modal || !card) return;
-
-
-  if (modalTitle) {
-    modalTitle.textContent =
-      card.dataset.title || "Project";
-  }
-
-
-  if (modalDescription) {
-    modalDescription.textContent =
-      card.dataset.description || "";
-  }
-
-
-  if (modalResult) {
-    modalResult.textContent =
-      card.dataset.result || "";
-  }
-
-
-  modal.classList.add("open");
-
-  modal.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-  document.body.style.overflow =
-    "hidden";
-
-}
-
-
-function closeModal() {
+function initCaseStudyModal() {
+  const modal = $("#caseModal");
 
   if (!modal) return;
 
+  const modalTitle = $("#modalTitle");
+  const modalDescription = $("#modalDescription");
+  const modalResult = $("#modalResult");
 
-  modal.classList.remove("open");
-
-  modal.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-  document.body.style.overflow =
-    "";
-
-}
+  const closeButtons = [
+    $(".modal-close"),
+    $(".modal-backdrop"),
+    $(".modal-cta")
+  ].filter(Boolean);
 
 
-// Open buttons
-$$(".case-open").forEach(button => {
+  function openModal(card) {
+    if (!card) return;
 
-  button.addEventListener("click", () => {
+    if (modalTitle) {
+      modalTitle.textContent =
+        card.dataset.title || "Project";
+    }
 
-    const card =
-      button.closest(".case-card");
+    if (modalDescription) {
+      modalDescription.textContent =
+        card.dataset.description || "";
+    }
 
-    openModal(card);
+    if (modalResult) {
+      modalResult.textContent =
+        card.dataset.result || "";
+    }
 
-  });
+    modal.classList.add("open");
 
-});
+    modal.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
-
-// Close buttons
-$(".modal-close")?.addEventListener(
-  "click",
-  closeModal
-);
-
-$(".modal-backdrop")?.addEventListener(
-  "click",
-  closeModal
-);
-
-$(".modal-cta")?.addEventListener(
-  "click",
-  closeModal
-);
-
-
-// Escape key
-document.addEventListener("keydown", event => {
-
-  if (event.key === "Escape") {
-    closeModal();
+    document.body.style.overflow =
+      "hidden";
   }
 
-});
 
-/* =========================================================
-   GOOGLE APPS SCRIPT
-   ========================================================= */
+  function closeModal() {
+    modal.classList.remove("open");
 
-const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxzBsIdFDmSS5gu2lh3thPUs-Fc9i3o4M0CHKxcjVG3D4rdWzAKedsTBKOv5Sm8uORcRA/exec";
+    modal.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
-/* =========================================================
-CONTACT FORM
-========================================================= */
-
-const contactForm = $("#contactForm");
-const formMessage = $("#formMessage");
+    document.body.style.overflow = "";
+  }
 
 
-/* =========================================================
-FORM MESSAGE
-========================================================= */
+  // Open modal buttons.
+  $$(".case-open").forEach(button => {
+    button.addEventListener("click", () => {
+      const card =
+        button.closest(".case-card");
 
-function setFormMessage(message = "", type = "") {
+      openModal(card);
+    });
+  });
 
-if (!formMessage) return;
 
-formMessage.textContent = message;
+  // Close modal buttons.
+  closeButtons.forEach(button => {
+    button.addEventListener(
+      "click",
+      closeModal
+    );
+  });
 
-formMessage.classList.remove(
- "success",
- "error"
-);
 
-if (type) {
- formMessage.classList.add(type);
+  // Escape key.
+  document.addEventListener(
+    "keydown",
+    event => {
+      if (
+        event.key === "Escape" &&
+        modal.classList.contains("open")
+      ) {
+        closeModal();
+      }
+    }
+  );
 }
-}
 
 
-/* =========================================================
-CONTACT FORM SUBMISSION
-========================================================= */
-
-if (contactForm) {
-
-contactForm.addEventListener(
- "submit",
- async (event) => {
-
-   event.preventDefault();
-
-
-   /* -----------------------------------------------------
-      Submit button
-      ----------------------------------------------------- */
-
-   const submitButton =
-     contactForm.querySelector(
-       'button[type="submit"]'
-     );
-
-   if (!submitButton) return;
-
-
-   /* -----------------------------------------------------
-      Browser validation
-      ----------------------------------------------------- */
-
-   if (!contactForm.checkValidity()) {
-
-     contactForm.reportValidity();
-
-     return;
-   }
-
-
-   /* -----------------------------------------------------
-      Save original button
-      ----------------------------------------------------- */
-
-   const originalButtonHTML =
-     submitButton.innerHTML;
-
-
-   /* -----------------------------------------------------
-      Loading state
-      ----------------------------------------------------- */
-
-   submitButton.disabled = true;
-
-   submitButton.innerHTML =
-     'Sending enquiry <span>…</span>';
-
-   setFormMessage();
-
-
-   /* -----------------------------------------------------
-      Collect form data
-      ----------------------------------------------------- */
-
-   const formData =
-     new FormData(contactForm);
-
-
-   const submission =
-     new URLSearchParams();
-
-
-   submission.append(
-     "name",
-     String(
-       formData.get("name") || ""
-     ).trim()
-   );
-
-   submission.append(
-     "email",
-     String(
-       formData.get("email") || ""
-     ).trim()
-   );
-
-   submission.append(
-     "goal",
-     String(
-       formData.get("goal") || ""
-     ).trim()
-   );
-
-   submission.append(
-     "budget",
-     String(
-       formData.get("budget") || ""
-     ).trim()
-   );
-
-   submission.append(
-     "timeline",
-     String(
-       formData.get("timeline") || ""
-     ).trim()
-   );
-
-   submission.append(
-     "message",
-     String(
-       formData.get("message") || ""
-     ).trim()
-   );
-
-
-   /* -----------------------------------------------------
-      Extra validation
-      ----------------------------------------------------- */
-
-   const name =
-     String(formData.get("name") || "").trim();
-
-   const email =
-     String(formData.get("email") || "").trim();
-
-   const goal =
-     String(formData.get("goal") || "").trim();
-
-   const message =
-     String(formData.get("message") || "").trim();
-
-
-   if (
-     !name ||
-     !email ||
-     !goal ||
-     !message
-   ) {
-
-     setFormMessage(
-       "Please complete all required fields.",
-       "error"
-     );
-
-     submitButton.disabled = false;
-
-     submitButton.innerHTML =
-       originalButtonHTML;
-
-     return;
-   }
-
-
-   /* -----------------------------------------------------
-      SEND TO GOOGLE APPS SCRIPT
-      ----------------------------------------------------- */
-
-   try {
-
-     /*
-      * IMPORTANT:
-      *
-      * We intentionally use no-cors.
-      *
-      * Google Apps Script Web Apps are cross-origin.
-      * no-cors allows the browser to send the POST
-      * without the browser blocking the request.
-      *
-      * DO NOT add a Content-Type header here.
-      */
-
-     await fetch(
-       GOOGLE_SCRIPT_URL,
-       {
-         method: "POST",
-         mode: "no-cors",
-         body: submission
-       }
-     );
-
-
-     /*
-      * With no-cors, the browser cannot read Google's
-      * response. However, if fetch completes without
-      * throwing a network error, the POST was sent.
-      */
-
-
-     /* ---------------------------------------------------
-        SUCCESS
-        --------------------------------------------------- */
-
-     contactForm.reset();
-
-
-     // Reset planner
-     if (
-       typeof resetPlanner === "function"
-     ) {
-
-       resetPlanner();
-
-     }
-
-
-     setFormMessage(
-       "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
-       "success"
-     );
-
-
-     if (
-       typeof showToast === "function"
-     ) {
-
-       showToast(
-         "Project enquiry sent successfully."
-       );
-
-     }
-
-
-   } catch (error) {
-
-     console.error(
-       "Webcraft form error:",
-       error
-     );
-
-
-     setFormMessage(
-       "We couldn't send your enquiry right now. Please try again.",
-       "error"
-     );
-
-
-     if (
-       typeof showToast === "function"
-     ) {
-
-       showToast(
-         "Unable to send enquiry."
-       );
-
-     }
-
-
-   } finally {
-
-     submitButton.disabled = false;
-
-     submitButton.innerHTML =
-       originalButtonHTML;
-
-   }
-
- }
-);
-
-}
 /* =========================================================
    TOAST NOTIFICATION
    ========================================================= */
@@ -662,34 +386,226 @@ let toastTimer = null;
 
 
 function showToast(message) {
-
-  const toast =
-    $("#toast");
+  const toast = $("#toast");
 
   if (!toast) return;
 
-
-  toast.textContent =
-    message;
-
+  toast.textContent = message;
 
   toast.classList.add("show");
 
+  clearTimeout(toastTimer);
 
-  clearTimeout(
-    toastTimer
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2400);
+}
+
+
+/* =========================================================
+   CONTACT FORM
+   ========================================================= */
+
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxzBsIdFDmSS5gu2lh3thPUs-Fc9i3o4M0CHKxcjVG3D4rdWzAKedsTBKOv5Sm8uORcRA/exec";
+
+
+function setFormMessage(
+  message = "",
+  type = ""
+) {
+  const formMessage = $("#formMessage");
+
+  if (!formMessage) return;
+
+  formMessage.textContent = message;
+
+  formMessage.classList.remove(
+    "success",
+    "error"
   );
 
+  if (type) {
+    formMessage.classList.add(type);
+  }
+}
 
-  toastTimer =
-    setTimeout(() => {
 
-      toast.classList.remove(
-        "show"
-      );
+function getFormValue(formData, field) {
+  return String(
+    formData.get(field) || ""
+  ).trim();
+}
 
-    }, 2400);
 
+function initContactForm() {
+  const contactForm = $("#contactForm");
+
+  if (!contactForm) return;
+
+  contactForm.addEventListener(
+    "submit",
+    async event => {
+      event.preventDefault();
+
+      const submitButton =
+        contactForm.querySelector(
+          'button[type="submit"]'
+        );
+
+      if (!submitButton) return;
+
+
+      /* -----------------------------------------------------
+         Browser validation
+         ----------------------------------------------------- */
+
+      if (!contactForm.checkValidity()) {
+        contactForm.reportValidity();
+        return;
+      }
+
+
+      /* -----------------------------------------------------
+         Save original button
+         ----------------------------------------------------- */
+
+      const originalButtonHTML =
+        submitButton.innerHTML;
+
+
+      /* -----------------------------------------------------
+         Collect form data
+         ----------------------------------------------------- */
+
+      const formData =
+        new FormData(contactForm);
+
+      const name =
+        getFormValue(formData, "name");
+
+      const email =
+        getFormValue(formData, "email");
+
+      const goal =
+        getFormValue(formData, "goal");
+
+      const budget =
+        getFormValue(formData, "budget");
+
+      const timeline =
+        getFormValue(formData, "timeline");
+
+      const message =
+        getFormValue(formData, "message");
+
+
+      /* -----------------------------------------------------
+         Extra validation
+         ----------------------------------------------------- */
+
+      if (
+        !name ||
+        !email ||
+        !goal ||
+        !message
+      ) {
+        setFormMessage(
+          "Please complete all required fields.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      /* -----------------------------------------------------
+         Prepare submission
+         ----------------------------------------------------- */
+
+      const submission =
+        new URLSearchParams();
+
+      submission.append("name", name);
+      submission.append("email", email);
+      submission.append("goal", goal);
+      submission.append("budget", budget);
+      submission.append("timeline", timeline);
+      submission.append("message", message);
+
+
+      /* -----------------------------------------------------
+         Loading state
+         ----------------------------------------------------- */
+
+      submitButton.disabled = true;
+
+      submitButton.innerHTML =
+        'Sending enquiry <span>…</span>';
+
+      setFormMessage();
+
+
+      /* -----------------------------------------------------
+         Send to Google Apps Script
+         ----------------------------------------------------- */
+
+      try {
+        await fetch(
+          GOOGLE_SCRIPT_URL,
+          {
+            method: "POST",
+            mode: "no-cors",
+            body: submission
+          }
+        );
+
+
+        /* ---------------------------------------------------
+           Success
+           --------------------------------------------------- */
+
+        contactForm.reset();
+
+        if (
+          typeof window.resetPlanner ===
+          "function"
+        ) {
+          window.resetPlanner();
+        }
+
+        setFormMessage(
+          "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
+          "success"
+        );
+
+        showToast(
+          "Project enquiry sent successfully."
+        );
+
+      } catch (error) {
+        console.error(
+          "Webcraft form error:",
+          error
+        );
+
+        setFormMessage(
+          "We couldn't send your enquiry right now. Please try again.",
+          "error"
+        );
+
+        showToast(
+          "Unable to send enquiry."
+        );
+
+      } finally {
+        submitButton.disabled = false;
+
+        submitButton.innerHTML =
+          originalButtonHTML;
+      }
+    }
+  );
 }
 
 
@@ -697,115 +613,103 @@ function showToast(message) {
    SHARE WEBSITE
    ========================================================= */
 
-const shareButton =
-  $("#shareButton");
+function initShareButton() {
+  const shareButton =
+    $("#shareButton");
+
+  if (!shareButton) return;
+
+  shareButton.addEventListener(
+    "click",
+    async () => {
+      const url =
+        window.location.href;
 
 
-shareButton?.addEventListener(
-  "click",
-  async () => {
-
-    const url =
-      window.location.href;
-
-
-    /* -------------------------------------------------------
-       Native share
-       ------------------------------------------------------- */
-
-    if (
-      typeof navigator.share ===
-      "function"
-    ) {
-
-      try {
-
-        await navigator.share({
-          title: "Webcraft",
-          text: "Webcraft — websites that work.",
-          url
-        });
-
-      } catch (error) {
-
-        // Ignore user cancellation
-        if (
-          error?.name !==
-          "AbortError"
-        ) {
-
-          console.error(
-            "Share error:",
-            error
-          );
-
-        }
-
-      }
-
-      return;
-
-    }
-
-
-    /* -------------------------------------------------------
-       Clipboard fallback
-       ------------------------------------------------------- */
-
-    try {
+      /* -----------------------------------------------------
+         Native share
+         ----------------------------------------------------- */
 
       if (
-        navigator.clipboard &&
-        typeof navigator.clipboard.writeText ===
+        typeof navigator.share ===
         "function"
       ) {
+        try {
+          await navigator.share({
+            title: "Webcraft",
+            text: "Webcraft — websites that work.",
+            url
+          });
 
-        await navigator.clipboard.writeText(
-          url
-        );
+        } catch (error) {
+          // User cancelled the share dialog.
+          if (
+            error?.name !==
+            "AbortError"
+          ) {
+            console.error(
+              "Share error:",
+              error
+            );
+          }
+        }
 
-        showToast(
-          "Webcraft link copied."
-        );
+        return;
+      }
 
-      } else {
+
+      /* -----------------------------------------------------
+         Clipboard fallback
+         ----------------------------------------------------- */
+
+      try {
+        if (
+          navigator.clipboard &&
+          typeof navigator.clipboard.writeText ===
+          "function"
+        ) {
+          await navigator.clipboard.writeText(
+            url
+          );
+
+          showToast(
+            "Webcraft link copied."
+          );
+
+          return;
+        }
 
         throw new Error(
           "Clipboard unavailable."
         );
 
+      } catch (error) {
+        console.error(
+          "Clipboard error:",
+          error
+        );
+
+        showToast(
+          "Unable to copy the link."
+        );
       }
-
-    } catch (error) {
-
-      console.error(
-        "Clipboard error:",
-        error
-      );
-
-      showToast(
-        "Unable to copy the link."
-      );
-
     }
-
-  }
-);
+  );
+}
 
 
 /* =========================================================
    CURRENT YEAR
    ========================================================= */
 
-const yearElement =
-  $("#year");
+function initCurrentYear() {
+  const yearElement =
+    $("#year");
 
-
-if (yearElement) {
+  if (!yearElement) return;
 
   yearElement.textContent =
     new Date().getFullYear();
-
 }
 
 
@@ -813,22 +717,27 @@ if (yearElement) {
    MAGNETIC BUTTON EFFECT
    ========================================================= */
 
-if (
-  window.matchMedia &&
-  window.matchMedia(
-    "(pointer: fine)"
-  ).matches
-) {
+function initMagneticButtons() {
+  if (
+    !window.matchMedia ||
+    !window.matchMedia(
+      "(pointer: fine)"
+    ).matches
+  ) {
+    return;
+  }
 
-  $$(".magnetic").forEach(button => {
+  const buttons =
+    $$(".magnetic");
 
+  if (!buttons.length) return;
+
+  buttons.forEach(button => {
     button.addEventListener(
       "mousemove",
       event => {
-
         const rect =
           button.getBoundingClientRect();
-
 
         const x =
           (
@@ -837,7 +746,6 @@ if (
             rect.width / 2
           ) * 0.06;
 
-
         const y =
           (
             event.clientY -
@@ -845,33 +753,48 @@ if (
             rect.height / 2
           ) * 0.06;
 
-
         button.style.transform =
           `translate(${x}px, ${y}px)`;
-
       }
     );
-
 
     button.addEventListener(
       "mouseleave",
       () => {
-
-        button.style.transform =
-          "";
-
+        button.style.transform = "";
       }
     );
-
   });
-
 }
 
 
 /* =========================================================
-   INITIALIZE
+   INITIALIZATION
    ========================================================= */
 
-console.log(
-  "Webcraft initialized."
-);
+function initWebcraft() {
+  initMobileNavigation();
+  initScrollReveal();
+  initPortfolioFilters();
+  initProjectPlanner();
+  initCaseStudyModal();
+  initContactForm();
+  initShareButton();
+  initCurrentYear();
+  initMagneticButtons();
+
+  console.log(
+    "Webcraft initialized successfully."
+  );
+}
+
+
+// Run after DOM is ready.
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    initWebcraft
+  );
+} else {
+  initWebcraft();
+}
