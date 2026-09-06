@@ -2,6 +2,15 @@
 <html lang="en">
 
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W0EY0KVNQ7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-W0EY0KVNQ7');
+</script>
   <meta charset="UTF-8">
 
   <meta
@@ -11,34 +20,53 @@
 
   <meta
     name="description"
-    content="Start a website project with Webcraft."
+    content="Start a website project with Webcraft. Tell us about your project and we'll get back to you."
   >
 
-  <title>Contact — Webcraft</title>
+  <title>Start a Project — Webcraft</title>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- =====================================================
+       FONTS
+  ====================================================== -->
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-  <!-- Global styles -->
+
+  <!-- =====================================================
+       GLOBAL STYLES
+  ====================================================== -->
+
   <link
     rel="stylesheet"
     href="../../css/styles.css"
   >
 
   <!-- Contact page styles -->
+
   <link
     rel="stylesheet"
     href="../../css/contact.css"
   >
+
 </head>
 
+
 <body>
+
 
   <!-- =====================================================
        NAVIGATION
@@ -46,13 +74,19 @@
 
   <header class="nav-wrap">
 
-    <nav class="nav container" aria-label="Main navigation">
+    <nav
+      class="nav container"
+      aria-label="Main navigation"
+    >
+
+      <!-- Brand -->
 
       <a
         href="../../index.html"
         class="brand"
         aria-label="Webcraft home"
       >
+
         <img
           src="../../assets/logo/logo.png"
           alt=""
@@ -61,16 +95,23 @@
         <span>
           Web<span>craft</span>
         </span>
+
       </a>
 
-      <div class="nav-links" id="navLinks">
+
+      <!-- Navigation links -->
+
+      <div
+        class="nav-links"
+        id="navLinks"
+      >
 
         <a href="../../index.html">
           Home
         </a>
 
         <a href="../work/work.html">
-        Our Work
+          Our Work
         </a>
 
         <a href="../services/services.html">
@@ -84,19 +125,26 @@
         <a href="../about/about.html">
           About Us
         </a>
-        <a href="../contact/contact.html">
+
+        <a
+          href="contact.html"
+          aria-current="page"
+        >
           Contact Us
         </a>
 
         <a
           href="contact.html"
           class="nav-cta"
-          aria-current="page"
         >
-          Start a project <b>↗</b>
+          Start a project
+          <b aria-hidden="true">↗</b>
         </a>
 
       </div>
+
+
+      <!-- Mobile menu -->
 
       <button
         class="menu-toggle"
@@ -105,14 +153,17 @@
         aria-expanded="false"
         aria-controls="navLinks"
       >
+
         <span></span>
         <span></span>
         <span></span>
+
       </button>
 
     </nav>
 
   </header>
+
 
 
   <!-- =====================================================
@@ -121,11 +172,17 @@
 
   <main>
 
-    <!-- CONTACT HERO -->
+
+    <!-- ===================================================
+         CONTACT HERO
+    ==================================================== -->
 
     <section class="contact-page">
 
       <div class="container">
+
+
+        <!-- Intro -->
 
         <div class="contact-page-intro">
 
@@ -139,21 +196,33 @@
           </h1>
 
           <p>
-            Tell us a little about your business, your goals,
-            and what you need from your website. We'll take it
-            from there.
+            Tell us what you're building, what you need,
+            and where you want to take it. We'll review
+            your enquiry and get back to you.
           </p>
 
         </div>
 
 
-        <!-- CONTACT CONTENT -->
+
+        <!-- =================================================
+             CONTACT GRID
+        ================================================== -->
 
         <div class="contact-page-grid">
 
-          <!-- INFO -->
 
-          <aside class="contact-page-info">
+          <!-- =================================================
+               CONTACT INFORMATION
+          ================================================== -->
+
+          <aside
+            class="contact-page-info"
+            aria-label="Contact information"
+          >
+
+
+            <!-- Email -->
 
             <div class="contact-info-block">
 
@@ -168,30 +237,52 @@
             </div>
 
 
+            <!-- Response -->
+
             <div class="contact-info-block">
 
               <span>
-                Typical projects
+                Response time
+              </span>
+
+              <p>
+                We usually respond within
+                1–2 business days.
+              </p>
+
+            </div>
+
+
+            <!-- Projects -->
+
+            <div class="contact-info-block">
+
+              <span>
+                What we build
               </span>
 
               <p>
                 Business websites<br>
                 Landing pages<br>
                 Portfolio websites<br>
-                E-commerce concepts
+                E-commerce websites
               </p>
 
             </div>
 
 
+            <!-- Process -->
+
             <div class="contact-info-block">
 
               <span>
-                Response
+                What happens next
               </span>
 
               <p>
-                Usually within 1–2 business days.
+                We'll review your enquiry,
+                understand what you need,
+                and contact you with the next steps.
               </p>
 
             </div>
@@ -199,29 +290,90 @@
           </aside>
 
 
-          <!-- FORM -->
+
+          <!-- =================================================
+               CONTACT FORM
+          ================================================== -->
 
           <div class="contact-page-form">
 
-            <form id="contactForm" novalidate>
 
-              <div class="contact-form-row">
+            <form
+              id="contactForm"
+              novalidate
+            >
+
+
+              <!-- =================================================
+                   CONTACT DETAILS
+              ================================================== -->
+
+              <div class="contact-form-section">
+
+                <div class="contact-form-section-heading">
+
+                  <span>
+                    01
+                  </span>
+
+                  <h2>
+                    Your details
+                  </h2>
+
+                </div>
+
+
+                <div class="contact-form-row">
+
+
+                  <!-- Name -->
+
+                  <label>
+
+                    <span>
+                      Name
+                    </span>
+
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Your name"
+                      autocomplete="name"
+                      required
+                    >
+
+                  </label>
+
+
+                  <!-- Phone -->
+
+                  <label>
+
+                    <span>
+                      Phone number
+                    </span>
+
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="+91 98765 43210"
+                      autocomplete="tel"
+                      inputmode="tel"
+                      required
+                    >
+
+                  </label>
+
+                </div>
+
+
+                <!-- Email -->
 
                 <label>
-                  Name
 
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Your name"
-                    autocomplete="name"
-                    required
-                  >
-                </label>
-
-
-                <label>
-                  Email
+                  <span>
+                    Email address
+                  </span>
 
                   <input
                     type="email"
@@ -230,89 +382,284 @@
                     autocomplete="email"
                     required
                   >
+
                 </label>
 
               </div>
 
 
-              <label>
-                Business / company
 
-                <input
-                  type="text"
-                  name="company"
-                  placeholder="Your business name"
-                  autocomplete="organization"
-                >
-              </label>
+              <!-- =================================================
+                   PROJECT INFORMATION
+              ================================================== -->
 
+              <div class="contact-form-section">
 
-              <label>
-                What do you need?
+                <div class="contact-form-section-heading">
 
-                <select
-                  name="project"
-                  required
-                >
-                  <option value="" selected disabled>
-                    Select a project type
-                  </option>
+                  <span>
+                    02
+                  </span>
 
-                  <option value="business">
-                    Business website
-                  </option>
+                  <h2>
+                    Your project
+                  </h2>
 
-                  <option value="landing">
-                    Landing page
-                  </option>
-
-                  <option value="portfolio">
-                    Portfolio website
-                  </option>
-
-                  <option value="ecommerce">
-                    E-commerce website
-                  </option>
-
-                  <option value="other">
-                    Something else
-                  </option>
-                </select>
-              </label>
+                </div>
 
 
-              <label>
-                Tell us about the project
+                <!-- Project type -->
 
-                <textarea
-                  name="message"
-                  placeholder="What are you building, and what should the website achieve?"
-                  required
-                ></textarea>
-              </label>
+                <label>
 
+                  <span>
+                    What do you need?
+                  </span>
+
+                  <select
+                    name="project"
+                    required
+                  >
+
+                    <option
+                      value=""
+                      selected
+                      disabled
+                    >
+                      Select a project type
+                    </option>
+
+                    <option value="business-website">
+                      Business website
+                    </option>
+
+                    <option value="landing-page">
+                      Landing page
+                    </option>
+
+                    <option value="portfolio-website">
+                      Portfolio website
+                    </option>
+
+                    <option value="ecommerce-website">
+                      E-commerce website
+                    </option>
+
+                    <option value="website-redesign">
+                      Website redesign
+                    </option>
+
+                    <option value="other">
+                      Something else
+                    </option>
+
+                  </select>
+
+                </label>
+
+
+                <!-- Existing website -->
+
+                <label>
+
+                  <span>
+                    Current website
+                    <small>(optional)</small>
+                  </span>
+
+                  <input
+                    type="url"
+                    name="website"
+                    placeholder="https://yourwebsite.com"
+                    autocomplete="url"
+                    inputmode="url"
+                  >
+
+                </label>
+
+
+                <!-- Timeline -->
+
+                <label>
+
+                  <span>
+                    When would you like to start?
+                  </span>
+
+                  <select
+                    name="timeline"
+                    required
+                  >
+
+                    <option
+                      value=""
+                      selected
+                      disabled
+                    >
+                      Select a timeframe
+                    </option>
+
+                    <option value="asap">
+                      As soon as possible
+                    </option>
+
+                    <option value="within-1-month">
+                      Within 1 month
+                    </option>
+
+                    <option value="1-3-months">
+                      Within 1–3 months
+                    </option>
+
+                    <option value="3-plus-months">
+                      3+ months
+                    </option>
+
+                    <option value="just-exploring">
+                      Just exploring for now
+                    </option>
+
+                  </select>
+
+                </label>
+
+              </div>
+
+
+
+              <!-- =================================================
+                   PROJECT DETAILS
+              ================================================== -->
+
+              <div class="contact-form-section">
+
+                <div class="contact-form-section-heading">
+
+                  <span>
+                    03
+                  </span>
+
+                  <h2>
+                    Tell us about it
+                  </h2>
+
+                </div>
+
+
+                <label>
+
+                  <span>
+                    Project details
+                  </span>
+
+                  <textarea
+                    name="message"
+                    placeholder="What are you building? What should the website achieve? Tell us anything you think is important."
+                    required
+                  ></textarea>
+
+                </label>
+
+
+                <!-- Referral -->
+
+                <label>
+
+                  <span>
+                    How did you hear about us?
+                    <small>(optional)</small>
+                  </span>
+
+                  <select
+                    name="source"
+                  >
+
+                    <option
+                      value=""
+                      selected
+                    >
+                      Select an option
+                    </option>
+
+                    <option value="google">
+                      Google
+                    </option>
+
+                    <option value="instagram">
+                      Instagram
+                    </option>
+
+                    <option value="linkedin">
+                      LinkedIn
+                    </option>
+
+                    <option value="referral">
+                      Referral
+                    </option>
+
+                    <option value="other">
+                      Other
+                    </option>
+
+                  </select>
+
+                </label>
+
+              </div>
+
+
+
+              <!-- =================================================
+                   SUBMIT
+              ================================================== -->
 
               <div class="contact-form-footer">
 
-                <p>
-                  No pressure. Just tell us what you're working on.
-                </p>
+                <div>
+
+                  <p>
+                    No pressure. Tell us what you're
+                    working on and we'll take it from there.
+                  </p>
+
+                  <p class="contact-form-privacy">
+                    Your information is only used to
+                    respond to your enquiry.
+                  </p>
+
+                </div>
+
 
                 <button
                   type="submit"
                   class="btn btn-dark"
                 >
-                  Send enquiry <span>↗</span>
+
+                  <span>
+                    Send enquiry
+                  </span>
+
+                  <span aria-hidden="true">
+                    ↗
+                  </span>
+
                 </button>
 
               </div>
 
 
-              <p
+              <!-- =================================================
+                   FORM STATUS
+              ================================================== -->
+
+              <div
                 class="contact-form-message"
                 id="contactMessage"
+                role="status"
                 aria-live="polite"
-              ></p>
+                aria-atomic="true"
+              ></div>
+
 
             </form>
 
@@ -325,7 +672,10 @@
     </section>
 
 
-    <!-- SIMPLE CTA -->
+
+    <!-- =====================================================
+         BOTTOM CTA
+    ====================================================== -->
 
     <section class="contact-bottom">
 
@@ -333,20 +683,26 @@
 
         <div class="contact-bottom-inner">
 
-          <span class="section-kicker">
-            Not ready yet?
-          </span>
+          <div>
 
-          <h2>
-            Explore the
-            <em>work first.</em>
-          </h2>
+            <span class="section-kicker">
+              Not ready yet?
+            </span>
+
+            <h2>
+              Explore the
+              <em>work first.</em>
+            </h2>
+
+          </div>
+
 
           <a
             href="../work/work.html"
             class="text-link"
           >
-            View selected work <span>↗</span>
+            View selected work
+            <span aria-hidden="true">↗</span>
           </a>
 
         </div>
@@ -358,6 +714,7 @@
   </main>
 
 
+
   <!-- =====================================================
        FOOTER
   ====================================================== -->
@@ -366,7 +723,11 @@
 
     <div class="container">
 
+
       <div class="footer-main">
+
+
+        <!-- Footer brand -->
 
         <div>
 
@@ -393,7 +754,10 @@
         </div>
 
 
+        <!-- Footer navigation -->
+
         <div class="footer-links">
+
 
           <div>
 
@@ -441,6 +805,9 @@
       </div>
 
 
+
+      <!-- Footer bottom -->
+
       <div class="footer-bottom">
 
         <span>
@@ -458,9 +825,14 @@
   </footer>
 
 
-  <!-- JavaScript -->
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
 
   <script src="../../js/main.js"></script>
+
+  <script src="../../js/pages.js"></script>
 
 </body>
 

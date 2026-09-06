@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W0EY0KVNQ7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-W0EY0KVNQ7');
+</script>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Webcraft website analytics and health dashboard."
+  >
+
+  <title>Dashboard — Webcraft</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Dashboard styles -->
+  <link
+    rel="stylesheet"
+    href="../../css/styles.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../../css/dashboard.css"
+  >
+</head>
+
+
+<body>
+
+  <!-- =====================================================
+       DASHBOARD SHELL
+  ====================================================== -->
+
+  <div class="dashboard-shell">
+
+
+    <!-- ===================================================
+         SIDEBAR
+    ==================================================== -->
+
+    <aside
+      class="dashboard-sidebar"
+      id="dashboardSidebar"
+      aria-label="Dashboard navigation"
+    >
+
+      <div class="dashboard-sidebar-top">
+
+        <!-- Brand -->
+
+        <a
+          href="../../index.html"
+          class="dashboard-brand"
+          aria-label="Webcraft home"
+        >
+
+          <img
+            src="../../assets/logo/logo.png"
+            alt=""
+          >
+
+          <span>
+            Web<span>craft</span>
+          </span>
+
+        </a>
+
+
+        <!-- Site status -->
+
+        <div class="dashboard-site-status">
+
+          <span class="status-dot status-dot-live"></span>
+
+          <div>
+            <strong>Webcraft Website</strong>
+            <small>Site is online</small>
+          </div>
+
+        </div>
+
+
+        <!-- Navigation -->
+
+        <nav class="dashboard-nav">
+
+          <span class="dashboard-nav-label">
+            Overview
+          </span>
+
+          <a
+            href="#overview"
+            class="dashboard-nav-link active"
+            aria-current="page"
+          >
+            <span aria-hidden="true">⌂</span>
+            Overview
+          </a>
+
+
+          <span class="dashboard-nav-label">
+            Analytics
+          </span>
+
+          <a
+            href="#traffic"
+            class="dashboard-nav-link"
+          >
+            <span aria-hidden="true">↗</span>
+            Traffic
+          </a>
+
+          <a
+            href="#pages"
+            class="dashboard-nav-link"
+          >
+            <span aria-hidden="true">▤</span>
+            Pages
+          </a>
+
+          <a
+            href="#leads"
+            class="dashboard-nav-link"
+          >
+            <span aria-hidden="true">✉</span>
+            Leads
+          </a>
+
+
+          <span class="dashboard-nav-label">
+            Website
+          </span>
+
+          <a
+            href="#health"
+            class="dashboard-nav-link"
+          >
+            <span aria-hidden="true">✓</span>
+            Website Health
+          </a>
+
+          <a
+            href="#seo"
+            class="dashboard-nav-link"
+          >
+            <span aria-hidden="true">⌕</span>
+            SEO
+          </a>
+
+          <a
+            href="#activity"
+            class="dashboard-nav-link"
+          >
+            <span aria-hidden="true">◷</span>
+            Activity
+          </a>
+
+        </nav>
+
+      </div>
+
+
+      <!-- Sidebar bottom -->
+
+      <div class="dashboard-sidebar-bottom">
+
+        <a
+          href="#settings"
+          class="dashboard-nav-link"
+        >
+          <span aria-hidden="true">⚙</span>
+          Settings
+        </a>
+
+        <a
+          href="../../index.html"
+          class="dashboard-view-site"
+          target="_blank"
+          rel="noopener"
+        >
+          View website
+          <span aria-hidden="true">↗</span>
+        </a>
+
+      </div>
+
+    </aside>
+
+
+    <!-- ===================================================
+         MAIN CONTENT
+    ==================================================== -->
+
+    <main class="dashboard-main">
+
+
+      <!-- =================================================
+           TOP BAR
+      ================================================== -->
+
+      <header class="dashboard-header">
+
+        <div class="dashboard-header-left">
+
+          <button
+            type="button"
+            class="dashboard-menu-toggle"
+            id="dashboardMenuToggle"
+            aria-label="Open dashboard menu"
+            aria-expanded="false"
+            aria-controls="dashboardSidebar"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+
+          <div>
+
+            <span class="dashboard-eyebrow">
+              Website dashboard
+            </span>
+
+            <h1>
+              Overview
+            </h1>
+
+          </div>
+
+        </div>
+
+
+        <div class="dashboard-header-actions">
+
+          <!-- Date range -->
+
+          <label class="dashboard-date-control">
+
+            <span class="sr-only">
+              Date range
+            </span>
+
+            <select id="dashboardDateRange">
+
+              <option value="today">
+                Today
+              </option>
+
+              <option value="7d">
+                Last 7 days
+              </option>
+
+              <option
+                value="30d"
+                selected
+              >
+                Last 30 days
+              </option>
+
+              <option value="90d">
+                Last 90 days
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <!-- Refresh -->
+
+          <button
+            type="button"
+            class="dashboard-icon-button"
+            id="dashboardRefresh"
+            aria-label="Refresh dashboard"
+            title="Refresh dashboard"
+          >
+            ↻
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- =================================================
+           CONTENT
+      ================================================== -->
+
+      <div class="dashboard-content">
+
+
+        <!-- =================================================
+             OVERVIEW
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="overview"
+          aria-labelledby="overviewTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Performance
+              </span>
+
+              <h2 id="overviewTitle">
+                Your website at a glance
+              </h2>
+
+            </div>
+
+            <span class="dashboard-updated">
+              Last checked:
+              <strong id="lastUpdated">
+                Just now
+              </strong>
+            </span>
+
+          </div>
+
+
+          <!-- KPI cards -->
+
+          <div class="dashboard-stat-grid">
+
+
+            <!-- Visitors -->
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-top">
+
+                <span class="dashboard-stat-label">
+                  Visitors
+                </span>
+
+                <span class="dashboard-stat-icon">
+                  ◉
+                </span>
+
+              </div>
+
+              <strong
+                class="dashboard-stat-value"
+                id="statVisitors"
+              >
+                —
+              </strong>
+
+              <p>
+                <span
+                  class="stat-change"
+                  id="statVisitorsChange"
+                >
+                  —
+                </span>
+                compared with previous period
+              </p>
+
+            </article>
+
+
+            <!-- Page views -->
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-top">
+
+                <span class="dashboard-stat-label">
+                  Page views
+                </span>
+
+                <span class="dashboard-stat-icon">
+                  ▧
+                </span>
+
+              </div>
+
+              <strong
+                class="dashboard-stat-value"
+                id="statPageViews"
+              >
+                —
+              </strong>
+
+              <p>
+                Total pages viewed
+              </p>
+
+            </article>
+
+
+            <!-- Sessions -->
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-top">
+
+                <span class="dashboard-stat-label">
+                  Sessions
+                </span>
+
+                <span class="dashboard-stat-icon">
+                  ◌
+                </span>
+
+              </div>
+
+              <strong
+                class="dashboard-stat-value"
+                id="statSessions"
+              >
+                —
+              </strong>
+
+              <p>
+                Website sessions
+              </p>
+
+            </article>
+
+
+            <!-- Engagement -->
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-top">
+
+                <span class="dashboard-stat-label">
+                  Engagement
+                </span>
+
+                <span class="dashboard-stat-icon">
+                  ↗
+                </span>
+
+              </div>
+
+              <strong
+                class="dashboard-stat-value"
+                id="statEngagement"
+              >
+                —
+              </strong>
+
+              <p>
+                Average engagement
+              </p>
+
+            </article>
+
+
+            <!-- Leads -->
+
+            <article class="dashboard-stat-card dashboard-stat-card-accent">
+
+              <div class="dashboard-stat-top">
+
+                <span class="dashboard-stat-label">
+                  Enquiries
+                </span>
+
+                <span class="dashboard-stat-icon">
+                  ✉
+                </span>
+
+              </div>
+
+              <strong
+                class="dashboard-stat-value"
+                id="statLeads"
+              >
+                —
+              </strong>
+
+              <p>
+                New project enquiries
+              </p>
+
+            </article>
+
+
+            <!-- Conversion -->
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-top">
+
+                <span class="dashboard-stat-label">
+                  Conversion
+                </span>
+
+                <span class="dashboard-stat-icon">
+                  %
+                </span>
+
+              </div>
+
+              <strong
+                class="dashboard-stat-value"
+                id="statConversion"
+              >
+                —
+              </strong>
+
+              <p>
+                Visitor → enquiry
+              </p>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TRAFFIC
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="traffic"
+          aria-labelledby="trafficTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Analytics
+              </span>
+
+              <h2 id="trafficTitle">
+                Traffic
+              </h2>
+
+            </div>
+
+            <span class="dashboard-section-meta">
+              Visitors over time
+            </span>
+
+          </div>
+
+
+          <div class="dashboard-two-column">
+
+
+            <!-- Traffic chart -->
+
+            <article class="dashboard-panel dashboard-chart-panel">
+
+              <div class="dashboard-panel-header">
+
+                <div>
+
+                  <h3>
+                    Visitors
+                  </h3>
+
+                  <p>
+                    Unique visitors during the selected period.
+                  </p>
+
+                </div>
+
+                <strong id="trafficTotal">
+                  —
+                </strong>
+
+              </div>
+
+
+              <div
+                class="dashboard-chart"
+                id="trafficChart"
+                aria-label="Website visitor chart"
+              >
+
+                <div class="dashboard-chart-empty">
+                  <span>Analytics not connected</span>
+                  <small>
+                    Connect an analytics provider to display traffic.
+                  </small>
+                </div>
+
+              </div>
+
+            </article>
+
+
+            <!-- Traffic sources -->
+
+            <article class="dashboard-panel">
+
+              <div class="dashboard-panel-header">
+
+                <div>
+
+                  <h3>
+                    Traffic sources
+                  </h3>
+
+                  <p>
+                    Where visitors are coming from.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div
+                class="dashboard-source-list"
+                id="trafficSources"
+              >
+
+                <div class="dashboard-empty-state compact">
+
+                  <span class="empty-icon">
+                    ↗
+                  </span>
+
+                  <strong>
+                    No traffic data yet
+                  </strong>
+
+                  <small>
+                    Connect analytics to see acquisition sources.
+                  </small>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PAGES
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="pages"
+          aria-labelledby="pagesTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Content
+              </span>
+
+              <h2 id="pagesTitle">
+                Top pages
+              </h2>
+
+            </div>
+
+            <span class="dashboard-section-meta">
+              Most visited pages
+            </span>
+
+          </div>
+
+
+          <article class="dashboard-panel dashboard-table-panel">
+
+            <div class="dashboard-table-wrap">
+
+              <table class="dashboard-table">
+
+                <thead>
+
+                  <tr>
+                    <th>Page</th>
+                    <th>Views</th>
+                    <th>Visitors</th>
+                    <th>Engagement</th>
+                    <th>Status</th>
+                  </tr>
+
+                </thead>
+
+                <tbody id="topPagesTable">
+
+                  <tr class="dashboard-table-empty">
+
+                    <td colspan="5">
+
+                      <div class="dashboard-empty-state">
+
+                        <span class="empty-icon">
+                          ▤
+                        </span>
+
+                        <strong>
+                          No page analytics available
+                        </strong>
+
+                        <small>
+                          Connect analytics to start tracking page performance.
+                        </small>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- =================================================
+             LEADS
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="leads"
+          aria-labelledby="leadsTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Enquiries
+              </span>
+
+              <h2 id="leadsTitle">
+                Recent leads
+              </h2>
+
+            </div>
+
+            <a
+              href="#"
+              class="dashboard-text-link"
+              id="viewAllLeads"
+            >
+              View all
+              <span>↗</span>
+            </a>
+
+          </div>
+
+
+          <article class="dashboard-panel dashboard-leads-panel">
+
+            <div
+              class="dashboard-leads-list"
+              id="recentLeads"
+            >
+
+              <div class="dashboard-empty-state">
+
+                <span class="empty-icon">
+                  ✉
+                </span>
+
+                <strong>
+                  No enquiries yet
+                </strong>
+
+                <small>
+                  Contact form submissions will appear here.
+                </small>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- =================================================
+             WEBSITE HEALTH
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="health"
+          aria-labelledby="healthTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Website
+              </span>
+
+              <h2 id="healthTitle">
+                Website health
+              </h2>
+
+            </div>
+
+            <span class="dashboard-section-meta">
+              Technical overview
+            </span>
+
+          </div>
+
+
+          <div class="dashboard-health-grid">
+
+
+            <!-- Overall score -->
+
+            <article class="dashboard-panel dashboard-health-score">
+
+              <div class="health-score-ring">
+
+                <span
+                  id="healthScore"
+                >
+                  —
+                </span>
+
+              </div>
+
+              <div>
+
+                <span class="health-score-label">
+                  Overall health
+                </span>
+
+                <h3 id="healthStatus">
+                  Not checked
+                </h3>
+
+                <p id="healthSummary">
+                  Run a website health check to evaluate your site.
+                </p>
+
+              </div>
+
+            </article>
+
+
+            <!-- Health checks -->
+
+            <article class="dashboard-panel">
+
+              <div class="dashboard-panel-header">
+
+                <div>
+
+                  <h3>
+                    Checks
+                  </h3>
+
+                  <p>
+                    Important website signals.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div class="health-check-list">
+
+
+                <div class="health-check">
+
+                  <div>
+                    <strong>
+                      Performance
+                    </strong>
+
+                    <small>
+                      Page loading and runtime
+                    </small>
+                  </div>
+
+                  <span
+                    class="health-badge pending"
+                    id="healthPerformance"
+                  >
+                    Not checked
+                  </span>
+
+                </div>
+
+
+                <div class="health-check">
+
+                  <div>
+                    <strong>
+                      SEO
+                    </strong>
+
+                    <small>
+                      Search visibility basics
+                    </small>
+                  </div>
+
+                  <span
+                    class="health-badge pending"
+                    id="healthSEO"
+                  >
+                    Not checked
+                  </span>
+
+                </div>
+
+
+                <div class="health-check">
+
+                  <div>
+                    <strong>
+                      Accessibility
+                    </strong>
+
+                    <small>
+                      Accessibility best practices
+                    </small>
+                  </div>
+
+                  <span
+                    class="health-badge pending"
+                    id="healthAccessibility"
+                  >
+                    Not checked
+                  </span>
+
+                </div>
+
+
+                <div class="health-check">
+
+                  <div>
+                    <strong>
+                      Links
+                    </strong>
+
+                    <small>
+                      Internal link integrity
+                    </small>
+                  </div>
+
+                  <span
+                    class="health-badge pending"
+                    id="healthLinks"
+                  >
+                    Not checked
+                  </span>
+
+                </div>
+
+
+                <div class="health-check">
+
+                  <div>
+                    <strong>
+                      Security
+                    </strong>
+
+                    <small>
+                      HTTPS and basic security
+                    </small>
+                  </div>
+
+                  <span
+                    class="health-badge pending"
+                    id="healthSecurity"
+                  >
+                    Not checked
+                  </span>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SEO
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="seo"
+          aria-labelledby="seoTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Search
+              </span>
+
+              <h2 id="seoTitle">
+                SEO performance
+              </h2>
+
+            </div>
+
+            <span class="dashboard-section-meta">
+              Search visibility
+            </span>
+
+          </div>
+
+
+          <div class="dashboard-stat-grid dashboard-seo-grid">
+
+
+            <article class="dashboard-stat-card">
+
+              <span class="dashboard-stat-label">
+                Impressions
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                id="seoImpressions"
+              >
+                —
+              </strong>
+
+              <p>
+                Search appearances
+              </p>
+
+            </article>
+
+
+            <article class="dashboard-stat-card">
+
+              <span class="dashboard-stat-label">
+                Clicks
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                id="seoClicks"
+              >
+                —
+              </strong>
+
+              <p>
+                Search visits
+              </p>
+
+            </article>
+
+
+            <article class="dashboard-stat-card">
+
+              <span class="dashboard-stat-label">
+                CTR
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                id="seoCTR"
+              >
+                —
+              </strong>
+
+              <p>
+                Average click-through rate
+              </p>
+
+            </article>
+
+
+            <article class="dashboard-stat-card">
+
+              <span class="dashboard-stat-label">
+                Avg. position
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                id="seoPosition"
+              >
+                —
+              </strong>
+
+              <p>
+                Search ranking position
+              </p>
+
+            </article>
+
+          </div>
+
+
+          <article class="dashboard-panel dashboard-table-panel">
+
+            <div class="dashboard-panel-header">
+
+              <div>
+
+                <h3>
+                  Top search queries
+                </h3>
+
+                <p>
+                  Queries bringing people to the website.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="dashboard-table-wrap">
+
+              <table class="dashboard-table">
+
+                <thead>
+
+                  <tr>
+                    <th>Search query</th>
+                    <th>Clicks</th>
+                    <th>Impressions</th>
+                    <th>CTR</th>
+                    <th>Position</th>
+                  </tr>
+
+                </thead>
+
+                <tbody id="seoQueriesTable">
+
+                  <tr class="dashboard-table-empty">
+
+                    <td colspan="5">
+
+                      <div class="dashboard-empty-state">
+
+                        <span class="empty-icon">
+                          ⌕
+                        </span>
+
+                        <strong>
+                          Search data unavailable
+                        </strong>
+
+                        <small>
+                          Connect Google Search Console to display SEO data.
+                        </small>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- =================================================
+             ACTIVITY
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="activity"
+          aria-labelledby="activityTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Monitoring
+              </span>
+
+              <h2 id="activityTitle">
+                Recent activity
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <article class="dashboard-panel">
+
+            <div
+              class="dashboard-activity-list"
+              id="activityList"
+            >
+
+              <div class="dashboard-empty-state">
+
+                <span class="empty-icon">
+                  ◷
+                </span>
+
+                <strong>
+                  No recent activity
+                </strong>
+
+                <small>
+                  Website events and monitoring updates will appear here.
+                </small>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- =================================================
+             SETTINGS
+        ================================================== -->
+
+        <section
+          class="dashboard-section"
+          id="settings"
+          aria-labelledby="settingsTitle"
+        >
+
+          <div class="dashboard-section-heading">
+
+            <div>
+
+              <span class="dashboard-section-kicker">
+                Configuration
+              </span>
+
+              <h2 id="settingsTitle">
+                Connections
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div class="dashboard-connections-grid">
+
+
+            <!-- Analytics -->
+
+            <article class="dashboard-panel dashboard-connection-card">
+
+              <div class="connection-icon">
+                ↗
+              </div>
+
+              <div class="connection-content">
+
+                <h3>
+                  Website Analytics
+                </h3>
+
+                <p>
+                  Track visitors, sessions, pages and engagement.
+                </p>
+
+                <span
+                  class="connection-status disconnected"
+                  id="analyticsStatus"
+                >
+                  Not connected
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="dashboard-secondary-button"
+                id="connectAnalytics"
+              >
+                Connect
+              </button>
+
+            </article>
+
+
+            <!-- Search Console -->
+
+            <article class="dashboard-panel dashboard-connection-card">
+
+              <div class="connection-icon">
+                ⌕
+              </div>
+
+              <div class="connection-content">
+
+                <h3>
+                  Search Console
+                </h3>
+
+                <p>
+                  Monitor Google search visibility and queries.
+                </p>
+
+                <span
+                  class="connection-status disconnected"
+                  id="searchConsoleStatus"
+                >
+                  Not connected
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="dashboard-secondary-button"
+                id="connectSearchConsole"
+              >
+                Connect
+              </button>
+
+            </article>
+
+
+            <!-- Contact system -->
+
+            <article class="dashboard-panel dashboard-connection-card">
+
+              <div class="connection-icon">
+                ✉
+              </div>
+
+              <div class="connection-content">
+
+                <h3>
+                  Contact Form
+                </h3>
+
+                <p>
+                  Receive and monitor website enquiries.
+                </p>
+
+                <span
+                  class="connection-status connected"
+                  id="contactStatus"
+                >
+                  Frontend configured
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="dashboard-secondary-button"
+                id="testContact"
+              >
+                Test
+              </button>
+
+            </article>
+
+
+            <!-- Site -->
+
+            <article class="dashboard-panel dashboard-connection-card">
+
+              <div class="connection-icon">
+                ✓
+              </div>
+
+              <div class="connection-content">
+
+                <h3>
+                  Website Monitoring
+                </h3>
+
+                <p>
+                  Check uptime, availability and technical health.
+                </p>
+
+                <span
+                  class="connection-status disconnected"
+                  id="monitoringStatus"
+                >
+                  Not configured
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="dashboard-secondary-button"
+                id="configureMonitoring"
+              >
+                Configure
+              </button>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+      </div>
+
+
+      <!-- =================================================
+           FOOTER
+      ================================================== -->
+
+      <footer class="dashboard-footer">
+
+        <span>
+          © <span id="dashboardYear"></span> Webcraft
+        </span>
+
+        <span>
+          Website dashboard
+        </span>
+
+      </footer>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       MOBILE OVERLAY
+  ====================================================== -->
+
+  <div
+    class="dashboard-overlay"
+    id="dashboardOverlay"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- =====================================================
+       TOAST
+  ====================================================== -->
+
+  <div
+    class="dashboard-toast"
+    id="dashboardToast"
+    role="status"
+    aria-live="polite"
+  ></div>
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+
+  <script src="../../js/main.js"></script>
+
+  <script src="../../js/dashboard.js"></script>
+
+</body>
+
+</html>

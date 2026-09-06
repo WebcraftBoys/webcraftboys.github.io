@@ -5,16 +5,22 @@
  * WEBCRAFT — MAIN.JS
  * =========================================================
  *
- * Global functionality used across the website:
+ * Global functionality used across the entire website:
+ *
  * - Page loader
  * - Mobile navigation
- * - Scroll reveal
+ * - Scroll reveal animations
  * - Website sharing
  * - Current year
  * - Magnetic buttons
  *
- * Page-specific functionality lives in page.js
+ * Page-specific functionality belongs in:
+ * js/page.js
+ *
+ * Do NOT put contact-form, portfolio, planner, or
+ * case-study logic in this file.
  */
+
 
 /* =========================================================
    HELPERS
@@ -45,11 +51,21 @@ function initLoader() {
     loader.classList.add("hidden");
   };
 
-  window.addEventListener("load", () => {
-    setTimeout(hideLoader, 400);
-  });
+  /*
+   * Normal page-load behavior.
+   */
+  window.addEventListener(
+    "load",
+    () => {
+      setTimeout(hideLoader, 400);
+    },
+    { once: true }
+  );
 
-  // Safety fallback.
+  /*
+   * Safety fallback in case the load event
+   * takes too long or another resource fails.
+   */
   setTimeout(hideLoader, 2500);
 }
 
@@ -64,9 +80,11 @@ function initMobileNavigation() {
 
   if (!menuToggle || !navLinks) return;
 
-  const navItems = $$(".nav-links a", navLinks);
+  const navItems =
+    $$(".nav-links a", navLinks);
 
-  const closeMenu = () => {
+
+  function closeMenu() {
     navLinks.classList.remove("open");
 
     menuToggle.setAttribute(
@@ -78,9 +96,10 @@ function initMobileNavigation() {
       "aria-label",
       "Open navigation"
     );
-  };
+  }
 
-  const openMenu = () => {
+
+  function openMenu() {
     navLinks.classList.add("open");
 
     menuToggle.setAttribute(
@@ -92,9 +111,10 @@ function initMobileNavigation() {
       "aria-label",
       "Close navigation"
     );
-  };
+  }
 
-  menuToggle.addEventListener("click", () => {
+
+  function toggleMenu() {
     const isOpen =
       navLinks.classList.contains("open");
 
@@ -103,47 +123,89 @@ function initMobileNavigation() {
     } else {
       openMenu();
     }
-  });
+  }
 
-  // Close after clicking a navigation link.
+
+  /*
+   * Toggle mobile menu.
+   */
+  menuToggle.addEventListener(
+    "click",
+    toggleMenu
+  );
+
+
+  /*
+   * Close menu after selecting a link.
+   */
   navItems.forEach(link => {
-    link.addEventListener("click", closeMenu);
+    link.addEventListener(
+      "click",
+      closeMenu
+    );
   });
 
-  // Close when clicking outside.
-  document.addEventListener("click", event => {
-    if (!navLinks.classList.contains("open")) {
-      return;
-    }
 
-    if (
-      !navLinks.contains(event.target) &&
-      !menuToggle.contains(event.target)
-    ) {
-      closeMenu();
-    }
-  });
+  /*
+   * Close when clicking outside.
+   */
+  document.addEventListener(
+    "click",
+    event => {
+      if (!navLinks.classList.contains("open")) {
+        return;
+      }
 
-  // Close with Escape.
-  document.addEventListener("keydown", event => {
-    if (
-      event.key === "Escape" &&
-      navLinks.classList.contains("open")
-    ) {
+      const clickedInsideMenu =
+        navLinks.contains(event.target);
+
+      const clickedToggle =
+        menuToggle.contains(event.target);
+
+      if (
+        !clickedInsideMenu &&
+        !clickedToggle
+      ) {
+        closeMenu();
+      }
+    }
+  );
+
+
+  /*
+   * Close with Escape.
+   */
+  document.addEventListener(
+    "keydown",
+    event => {
+      if (
+        event.key !== "Escape" ||
+        !navLinks.classList.contains("open")
+      ) {
+        return;
+      }
+
       closeMenu();
       menuToggle.focus();
     }
-  });
+  );
 
-  // Close mobile menu on desktop resize.
-  window.addEventListener("resize", () => {
-    if (
-      window.innerWidth > 768 &&
-      navLinks.classList.contains("open")
-    ) {
-      closeMenu();
+
+  /*
+   * Close mobile menu when returning
+   * to desktop width.
+   */
+  window.addEventListener(
+    "resize",
+    () => {
+      if (
+        window.innerWidth > 768 &&
+        navLinks.classList.contains("open")
+      ) {
+        closeMenu();
+      }
     }
-  });
+  );
 }
 
 
@@ -152,12 +214,19 @@ function initMobileNavigation() {
 ========================================================= */
 
 function initScrollReveal() {
-  const elements = $$(".reveal");
+  const elements =
+    $$(".reveal");
 
   if (!elements.length) return;
 
-  // Fallback.
-  if (!("IntersectionObserver" in window)) {
+
+  /*
+   * Fallback for browsers without
+   * IntersectionObserver.
+   */
+  if (
+    !("IntersectionObserver" in window)
+  ) {
     elements.forEach(element => {
       element.classList.add("visible");
     });
@@ -165,21 +234,31 @@ function initScrollReveal() {
     return;
   }
 
-  const observer = new IntersectionObserver(
-    entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
 
-        entry.target.classList.add("visible");
+  const observer =
+    new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) {
+            return;
+          }
 
-        observer.unobserve(entry.target);
-      });
-    },
-    {
-      threshold: 0.12,
-      rootMargin: "0px 0px -40px 0px"
-    }
-  );
+          entry.target.classList.add(
+            "visible"
+          );
+
+          observer.unobserve(
+            entry.target
+          );
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin:
+          "0px 0px -40px 0px"
+      }
+    );
+
 
   elements.forEach(element => {
     observer.observe(element);
@@ -193,12 +272,14 @@ function initScrollReveal() {
 
 let toastTimer = null;
 
+
 function showToast(message) {
   const toast = $("#toast");
 
   if (!toast) return;
 
-  toast.textContent = String(message || "");
+  toast.textContent =
+    String(message || "");
 
   toast.classList.add("show");
 
@@ -215,51 +296,93 @@ function showToast(message) {
 ========================================================= */
 
 function initShareButton() {
-  const button = $("#shareButton");
+  const button =
+    $("#shareButton");
 
   if (!button) return;
 
-  button.addEventListener("click", async () => {
-    const url = window.location.href;
 
-    // Native share.
-    if (typeof navigator.share === "function") {
-      try {
-        await navigator.share({
-          title: "Webcraft",
-          text: "Webcraft — websites that work.",
-          url
-        });
-      } catch (error) {
-        if (error?.name !== "AbortError") {
-          console.error("Share error:", error);
-        }
-      }
+  button.addEventListener(
+    "click",
+    async () => {
+      const url =
+        window.location.href;
 
-      return;
-    }
 
-    // Clipboard fallback.
-    try {
+      /*
+       * Native share API.
+       */
       if (
-        navigator.clipboard &&
-        typeof navigator.clipboard.writeText ===
-          "function"
+        typeof navigator.share ===
+        "function"
       ) {
-        await navigator.clipboard.writeText(url);
+        try {
+          await navigator.share({
+            title: "Webcraft",
+            text:
+              "Webcraft — websites that work.",
+            url
+          });
 
-        showToast("Webcraft link copied.");
+        } catch (error) {
+
+          /*
+           * Ignore intentional cancellation.
+           */
+          if (
+            error?.name !==
+            "AbortError"
+          ) {
+            console.error(
+              "Share error:",
+              error
+            );
+          }
+        }
 
         return;
       }
 
-      throw new Error("Clipboard API unavailable.");
-    } catch (error) {
-      console.error("Clipboard error:", error);
 
-      showToast("Unable to copy the link.");
+      /*
+       * Clipboard fallback.
+       */
+      try {
+
+        if (
+          navigator.clipboard &&
+          typeof navigator.clipboard
+            .writeText ===
+            "function"
+        ) {
+          await navigator.clipboard.writeText(
+            url
+          );
+
+          showToast(
+            "Webcraft link copied."
+          );
+
+          return;
+        }
+
+        throw new Error(
+          "Clipboard API unavailable."
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Clipboard error:",
+          error
+        );
+
+        showToast(
+          "Unable to copy the link."
+        );
+      }
     }
-  });
+  );
 }
 
 
@@ -268,12 +391,15 @@ function initShareButton() {
 ========================================================= */
 
 function initCurrentYear() {
-  const year = $("#year");
+  const year =
+    $("#year");
 
   if (!year) return;
 
   year.textContent =
-    String(new Date().getFullYear());
+    String(
+      new Date().getFullYear()
+    );
 }
 
 
@@ -282,58 +408,86 @@ function initCurrentYear() {
 ========================================================= */
 
 function initMagneticButtons() {
+
+  /*
+   * Only enable the effect on devices
+   * with a precise pointer such as a mouse.
+   */
   if (
     !window.matchMedia ||
-    !window.matchMedia("(pointer: fine)").matches
+    !window.matchMedia(
+      "(pointer: fine)"
+    ).matches
   ) {
     return;
   }
 
-  const buttons = $$(".magnetic");
+
+  const buttons =
+    $$(".magnetic");
 
   if (!buttons.length) return;
 
+
   buttons.forEach(button => {
-    button.addEventListener("mousemove", event => {
-      const rect =
-        button.getBoundingClientRect();
 
-      const offsetX =
-        (
-          event.clientX -
-          rect.left -
-          rect.width / 2
-        ) * 0.06;
+    button.addEventListener(
+      "mousemove",
+      event => {
 
-      const offsetY =
-        (
-          event.clientY -
-          rect.top -
-          rect.height / 2
-        ) * 0.06;
+        const rect =
+          button.getBoundingClientRect();
 
-      button.style.transform =
-        `translate(${offsetX}px, ${offsetY}px)`;
-    });
 
-    button.addEventListener("mouseleave", () => {
-      button.style.transform = "";
-    });
+        const offsetX =
+          (
+            event.clientX -
+            rect.left -
+            rect.width / 2
+          ) * 0.06;
+
+
+        const offsetY =
+          (
+            event.clientY -
+            rect.top -
+            rect.height / 2
+          ) * 0.06;
+
+
+        button.style.transform =
+          `translate(${offsetX}px, ${offsetY}px)`;
+      }
+    );
+
+
+    button.addEventListener(
+      "mouseleave",
+      () => {
+        button.style.transform = "";
+      }
+    );
+
   });
 }
 
 
 /* =========================================================
-   INITIALIZE
+   INITIALIZE WEBCRAFT
 ========================================================= */
 
 function initWebcraft() {
+
+  /*
+   * Global features only.
+   */
   initLoader();
   initMobileNavigation();
   initScrollReveal();
   initShareButton();
   initCurrentYear();
   initMagneticButtons();
+
 
   console.log(
     "Webcraft main.js initialized."
@@ -342,15 +496,24 @@ function initWebcraft() {
 
 
 /* =========================================================
-   START
+   START APPLICATION
 ========================================================= */
 
-if (document.readyState === "loading") {
+if (
+  document.readyState ===
+  "loading"
+) {
+
   document.addEventListener(
     "DOMContentLoaded",
     initWebcraft,
-    { once: true }
+    {
+      once: true
+    }
   );
+
 } else {
+
   initWebcraft();
+
 }

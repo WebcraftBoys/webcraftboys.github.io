@@ -6,11 +6,15 @@
  * =========================================================
  *
  * Page-specific functionality:
+ *
+ * - Contact form
+ * - Google Apps Script submission
  * - Portfolio filters
  * - Project planner
  * - Case study modal
- * - Contact form
- * - Google Apps Script submission
+ *
+ * Global functionality belongs in:
+ * js/main.js
  */
 
 
@@ -22,83 +26,463 @@ const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxzBsIdFDmSS5gu2lh3thPUs-Fc9i3o4M0CHKxcjVG3D4rdWzAKedsTBKOv5Sm8uORcRA/exec";
 
 
-function initWebcraft() {
-  initLoader();
-  initMobileNavigation();
-  initScrollReveal();
-  initPortfolioFilters();
-  initProjectPlanner();
-  initCaseStudyModal();
-  initContactForm();
-  initShareButton();
-  initCurrentYear();
-  initMagneticButtons();
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const page$ = (selector, parent = document) =>
+  parent.querySelector(selector);
+
+const page$$ = (selector, parent = document) =>
+  Array.from(parent.querySelectorAll(selector));
+
+
+function getFieldValue(formData, fieldName) {
+  return String(
+    formData.get(fieldName) || ""
+  ).trim();
 }
+
+
+/* =========================================================
+   CONTACT FORM MESSAGE
+========================================================= */
+
+function setContactMessage(
+  message = "",
+  type = ""
+) {
+  const messageElement =
+    page$("#contactMessage");
+
+  if (!messageElement) return;
+
+  messageElement.textContent =
+    message;
+
+  messageElement.classList.remove(
+    "success",
+    "error"
+  );
+
+  if (
+    type === "success" ||
+    type === "error"
+  ) {
+    messageElement.classList.add(type);
+  }
+}
+
+
+/* =========================================================
+   CONTACT FORM
+========================================================= */
+
+function initContactForm() {
+  const form =
+    page$("#contactForm");
+
+  if (!form) return;
+
+
+  /*
+   * Prevent this function from being
+   * initialized more than once.
+   */
+  if (
+    form.dataset.contactInitialized ===
+    "true"
+  ) {
+    return;
+  }
+
+  form.dataset.contactInitialized =
+    "true";
+
+
+  const submitButton =
+    form.querySelector(
+      'button[type="submit"]'
+    );
+
+  if (!submitButton) return;
+
+
+  form.addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+
+      /*
+       * Clear previous status.
+       */
+      setContactMessage();
+
+
+      /*
+       * Native browser validation.
+       */
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+
+      const formData =
+        new FormData(form);
+
+
+      /*
+       * Current contact fields.
+       *
+       * Keep these names synchronized
+       * with contact.html.
+       */
+      const name =
+        getFieldValue(
+          formData,
+          "name"
+        );
+
+      const email =
+        getFieldValue(
+          formData,
+          "email"
+        );
+
+      const phone =
+        getFieldValue(
+          formData,
+          "phone"
+        );
+
+      const project =
+        getFieldValue(
+          formData,
+          "project"
+        );
+
+      const timeline =
+        getFieldValue(
+          formData,
+          "timeline"
+        );
+
+      const message =
+        getFieldValue(
+          formData,
+          "message"
+        );
+
+
+      /*
+       * Required-field validation.
+       */
+      if (
+        !name ||
+        !email ||
+        !phone ||
+        !project ||
+        !timeline ||
+        !message
+      ) {
+        setContactMessage(
+          "Please complete all required fields.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      /*
+       * Extra email validation.
+       */
+      const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(email)) {
+        setContactMessage(
+          "Please enter a valid email address.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      /*
+       * Save original button contents.
+       */
+      const originalHTML =
+        submitButton.innerHTML;
+
+
+      /*
+       * Prevent double submissions.
+       */
+      submitButton.disabled =
+        true;
+
+      submitButton.setAttribute(
+        "aria-busy",
+        "true"
+      );
+
+      submitButton.innerHTML =
+        'Sending enquiry <span aria-hidden="true">…</span>';
+
+
+      try {
+
+        /*
+         * Build URL-encoded request.
+         *
+         * This format works reliably with
+         * Google Apps Script web apps.
+         */
+        const request =
+          new URLSearchParams();
+
+
+        request.set(
+          "name",
+          name
+        );
+
+        request.set(
+          "email",
+          email
+        );
+
+        request.set(
+          "phone",
+          phone
+        );
+
+        request.set(
+          "project",
+          project
+        );
+
+        request.set(
+          "timeline",
+          timeline
+        );
+
+        request.set(
+          "message",
+          message
+        );
+
+
+        /*
+         * Submit to Google Apps Script.
+         *
+         * no-cors is intentional because the
+         * frontend cannot reliably read the
+         * response from another origin.
+         */
+        await fetch(
+          GOOGLE_SCRIPT_URL,
+          {
+            method: "POST",
+
+            mode: "no-cors",
+
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded;charset=UTF-8"
+            },
+
+            body:
+              request.toString()
+          }
+        );
+
+
+        /*
+         * The request completed.
+         *
+         * Because no-cors prevents us from
+         * inspecting the response, we cannot
+         * verify the Apps Script response body.
+         */
+        form.reset();
+
+
+        /*
+         * Show visible success state.
+         */
+        setContactMessage(
+          "Thanks! Your enquiry has been sent. We'll get back to you within 1–2 business days.",
+          "success"
+        );
+
+
+        /*
+         * Use the global toast when available.
+         */
+        if (
+          typeof showToast ===
+          "function"
+        ) {
+          showToast(
+            "Enquiry sent successfully."
+          );
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Webcraft contact form error:",
+          error
+        );
+
+
+        setContactMessage(
+          "We couldn't send your enquiry right now. Please try again.",
+          "error"
+        );
+
+
+        if (
+          typeof showToast ===
+          "function"
+        ) {
+          showToast(
+            "Unable to send enquiry."
+          );
+        }
+
+      } finally {
+
+        /*
+         * Restore button.
+         */
+        submitButton.disabled =
+          false;
+
+        submitButton.removeAttribute(
+          "aria-busy"
+        );
+
+        submitButton.innerHTML =
+          originalHTML;
+      }
+    }
+  );
+}
+
+
 /* =========================================================
    PORTFOLIO FILTERS
 ========================================================= */
 
 function initPortfolioFilters() {
-  const buttons = $$(".filter");
+  const buttons =
+    page$$(".filter");
+
+  const cards =
+    page$$(
+      ".case-card, .work-project-card"
+    );
+
+  if (
+    !buttons.length ||
+    !cards.length
+  ) {
+    return;
+  }
+
 
   /*
-   * Support both the older .case-card markup
-   * and the new Work page .work-project-card markup.
+   * Prevent duplicate listeners.
    */
-  const cards = $$(".case-card, .work-project-card");
-
-  if (!buttons.length || !cards.length) return;
-
-  const updateFilter = selectedButton => {
-    const filter =
-      selectedButton.dataset.filter || "all";
-
-    buttons.forEach(button => {
-      const active =
-        button === selectedButton;
-
-      button.classList.toggle(
-        "active",
-        active
-      );
-
-      button.setAttribute(
-        "aria-pressed",
-        String(active)
-      );
-    });
-
-    cards.forEach(card => {
-      const category =
-        card.dataset.category || "";
-
-      const hidden =
-        filter !== "all" &&
-        category !== filter;
-
-      card.classList.toggle(
-        "hidden",
-        hidden
-      );
-
-      card.setAttribute(
-        "aria-hidden",
-        String(hidden)
-      );
-    });
-  };
-
   buttons.forEach(button => {
-    button.addEventListener("click", () => {
-      updateFilter(button);
-    });
+
+    if (
+      button.dataset.filterInitialized ===
+      "true"
+    ) {
+      return;
+    }
+
+    button.dataset.filterInitialized =
+      "true";
+
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const selectedFilter =
+          button.dataset.filter ||
+          "all";
+
+
+        /*
+         * Update active button.
+         */
+        buttons.forEach(item => {
+
+          const active =
+            item === button;
+
+          item.classList.toggle(
+            "active",
+            active
+          );
+
+          item.setAttribute(
+            "aria-pressed",
+            String(active)
+          );
+        });
+
+
+        /*
+         * Filter cards.
+         */
+        cards.forEach(card => {
+
+          const category =
+            card.dataset.category ||
+            "";
+
+          const hidden =
+            selectedFilter !== "all" &&
+            category !== selectedFilter;
+
+
+          card.classList.toggle(
+            "hidden",
+            hidden
+          );
+
+          card.setAttribute(
+            "aria-hidden",
+            String(hidden)
+          );
+        });
+      }
+    );
   });
 
+
+  /*
+   * Initialize active filter.
+   */
   const activeButton =
-    $(".filter.active") || buttons[0];
+    page$(".filter.active") ||
+    buttons[0];
+
 
   if (activeButton) {
-    updateFilter(activeButton);
+    activeButton.click();
   }
 }
 
@@ -112,31 +496,40 @@ const DEFAULT_GOAL =
 
 
 function initProjectPlanner() {
-  const goals = $$(".goal");
+  const goals =
+    page$$(".goal");
 
   if (!goals.length) return;
 
+
   const goalOutput =
-    $("#goalOutput");
+    page$("#goalOutput");
 
   const goalSelect =
-    $("#goalSelect");
+    page$("#goalSelect");
 
   const plannerNext =
-    $("#plannerNext");
+    page$("#plannerNext");
 
 
   function selectGoal(button) {
     if (!button) return;
+
 
     const goal =
       String(
         button.dataset.goal || ""
       ).trim();
 
+
     if (!goal) return;
 
+
+    /*
+     * Update selected goal.
+     */
     goals.forEach(item => {
+
       const active =
         item === button;
 
@@ -151,12 +544,24 @@ function initProjectPlanner() {
       );
     });
 
+
+    /*
+     * Update visible planner text.
+     */
     if (goalOutput) {
-      goalOutput.textContent = goal;
+      goalOutput.textContent =
+        goal;
     }
 
+
+    /*
+     * Synchronize with any older
+     * planner select if present.
+     */
     if (goalSelect) {
-      goalSelect.value = goal;
+
+      goalSelect.value =
+        goal;
 
       goalSelect.dispatchEvent(
         new Event("change", {
@@ -168,6 +573,7 @@ function initProjectPlanner() {
 
 
   function resetPlanner() {
+
     const defaultGoal =
       goals.find(
         goal =>
@@ -175,13 +581,18 @@ function initProjectPlanner() {
           DEFAULT_GOAL
       );
 
+
     if (defaultGoal) {
       selectGoal(defaultGoal);
       return;
     }
 
+
     goals.forEach(goal => {
-      goal.classList.remove("active");
+
+      goal.classList.remove(
+        "active"
+      );
 
       goal.setAttribute(
         "aria-pressed",
@@ -189,10 +600,12 @@ function initProjectPlanner() {
       );
     });
 
+
     if (goalOutput) {
       goalOutput.textContent =
         DEFAULT_GOAL;
     }
+
 
     if (goalSelect) {
       goalSelect.value = "";
@@ -200,12 +613,30 @@ function initProjectPlanner() {
   }
 
 
-  // Make this available to the contact form.
+  /*
+   * Expose reset function for any
+   * other page feature that needs it.
+   */
   window.resetPlanner =
     resetPlanner;
 
 
+  /*
+   * Goal buttons.
+   */
   goals.forEach(goal => {
+
+    if (
+      goal.dataset.plannerInitialized ===
+      "true"
+    ) {
+      return;
+    }
+
+    goal.dataset.plannerInitialized =
+      "true";
+
+
     goal.addEventListener(
       "click",
       () => {
@@ -215,11 +646,15 @@ function initProjectPlanner() {
   });
 
 
+  /*
+   * Continue button.
+   */
   plannerNext?.addEventListener(
     "click",
     () => {
+
       const activeGoal =
-        $(".goal.active");
+        page$(".goal.active");
 
       if (activeGoal) {
         selectGoal(activeGoal);
@@ -228,14 +663,18 @@ function initProjectPlanner() {
   );
 
 
+  /*
+   * Initialize planner state.
+   */
   const initialGoal =
-    $(".goal.active") ||
+    page$(".goal.active") ||
     goals.find(
       goal =>
         goal.dataset.goal ===
         DEFAULT_GOAL
     ) ||
     goals[0];
+
 
   if (initialGoal) {
     selectGoal(initialGoal);
@@ -248,42 +687,64 @@ function initProjectPlanner() {
 ========================================================= */
 
 function initCaseStudyModal() {
-  const modal = $("#caseModal");
+  const modal =
+    page$("#caseModal");
 
   if (!modal) return;
 
+
+  if (
+    modal.dataset.modalInitialized ===
+    "true"
+  ) {
+    return;
+  }
+
+  modal.dataset.modalInitialized =
+    "true";
+
+
   const modalTitle =
-    $("#modalTitle");
+    page$("#modalTitle");
 
   const modalDescription =
-    $("#modalDescription");
+    page$("#modalDescription");
 
   const modalResult =
-    $("#modalResult");
+    page$("#modalResult");
 
   const modalClose =
-    $(".modal-close");
+    page$(".modal-close");
 
   const modalBackdrop =
-    $(".modal-backdrop");
+    page$(".modal-backdrop");
 
   const modalCTA =
-    $(".modal-cta");
+    page$(".modal-cta");
 
-  let lastFocusedElement = null;
+
+  let lastFocusedElement =
+    null;
 
 
   function openModal(card) {
+
     if (!card) return;
+
 
     lastFocusedElement =
       document.activeElement;
 
+
+    /*
+     * Populate modal.
+     */
     if (modalTitle) {
       modalTitle.textContent =
         card.dataset.title ||
         "Project";
     }
+
 
     if (modalDescription) {
       modalDescription.textContent =
@@ -291,13 +752,20 @@ function initCaseStudyModal() {
         "";
     }
 
+
     if (modalResult) {
       modalResult.textContent =
         card.dataset.result ||
         "";
     }
 
-    modal.classList.add("open");
+
+    /*
+     * Open modal.
+     */
+    modal.classList.add(
+      "open"
+    );
 
     modal.setAttribute(
       "aria-hidden",
@@ -307,20 +775,32 @@ function initCaseStudyModal() {
     document.body.style.overflow =
       "hidden";
 
+
+    /*
+     * Move focus to close button.
+     */
     modalClose?.focus();
   }
 
 
   function closeModal() {
-    modal.classList.remove("open");
+
+    modal.classList.remove(
+      "open"
+    );
 
     modal.setAttribute(
       "aria-hidden",
       "true"
     );
 
-    document.body.style.overflow = "";
+    document.body.style.overflow =
+      "";
 
+
+    /*
+     * Restore focus.
+     */
     if (
       lastFocusedElement &&
       typeof lastFocusedElement.focus ===
@@ -329,23 +809,37 @@ function initCaseStudyModal() {
       lastFocusedElement.focus();
     }
 
-    lastFocusedElement = null;
+
+    lastFocusedElement =
+      null;
   }
 
 
-  $$(".case-open").forEach(button => {
-    button.addEventListener(
-      "click",
-      () => {
-        const card =
-          button.closest(".case-card");
+  /*
+   * Open buttons.
+   */
+  page$$(".case-open").forEach(
+    button => {
 
-        openModal(card);
-      }
-    );
-  });
+      button.addEventListener(
+        "click",
+        () => {
+
+          const card =
+            button.closest(
+              ".case-card"
+            );
+
+          openModal(card);
+        }
+      );
+    }
+  );
 
 
+  /*
+   * Close controls.
+   */
   modalClose?.addEventListener(
     "click",
     closeModal
@@ -362,12 +856,18 @@ function initCaseStudyModal() {
   );
 
 
+  /*
+   * Escape key.
+   */
   document.addEventListener(
     "keydown",
     event => {
+
       if (
         event.key === "Escape" &&
-        modal.classList.contains("open")
+        modal.classList.contains(
+          "open"
+        )
       ) {
         closeModal();
       }
@@ -377,197 +877,19 @@ function initCaseStudyModal() {
 
 
 /* =========================================================
-   FORM MESSAGE
-========================================================= */
-
-function setFormMessage(
-  message = "",
-  type = ""
-) {
-  const formMessage =
-    $("#formMessage");
-
-  if (!formMessage) return;
-
-  formMessage.textContent =
-    message;
-
-  formMessage.classList.remove(
-    "success",
-    "error"
-  );
-
-  if (
-    type === "success" ||
-    type === "error"
-  ) {
-    formMessage.classList.add(type);
-  }
-}
-
-
-/* =========================================================
-   FORM VALUE
-========================================================= */
-
-function getFormValue(
-  formData,
-  field
-) {
-  return String(
-    formData.get(field) || ""
-  ).trim();
-}
-
-/* =========================================================
-   CONTACT FORM
-========================================================= */
-
-function initContactForm() {
-  const form = $("#contactForm");
-
-  if (!form) return;
-
-  const submitButton =
-    form.querySelector('button[type="submit"]');
-
-  const formMessage =
-    $("#contactMessage");
-
-  if (!submitButton) return;
-
-  form.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    if (formMessage) {
-      formMessage.textContent = "";
-      formMessage.classList.remove(
-        "success",
-        "error"
-      );
-    }
-
-    // Validate required fields.
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-
-    const formData = new FormData(form);
-
-    const name =
-      String(formData.get("name") || "").trim();
-
-    const email =
-      String(formData.get("email") || "").trim();
-
-    const company =
-      String(formData.get("company") || "").trim();
-
-    const project =
-      String(formData.get("project") || "").trim();
-
-    const message =
-      String(formData.get("message") || "").trim();
-
-    if (!name || !email || !project || !message) {
-      if (formMessage) {
-        formMessage.textContent =
-          "Please complete all required fields.";
-
-        formMessage.classList.add("error");
-      }
-
-      return;
-    }
-
-    const originalHTML =
-      submitButton.innerHTML;
-
-    submitButton.disabled = true;
-
-    submitButton.setAttribute(
-      "aria-busy",
-      "true"
-    );
-
-    submitButton.innerHTML =
-      'Sending enquiry <span aria-hidden="true">…</span>';
-
-    try {
-      const request =
-        new URLSearchParams();
-
-      request.set("name", name);
-      request.set("email", email);
-      request.set("company", company);
-      request.set("project", project);
-      request.set("message", message);
-
-      await fetch(
-        GOOGLE_SCRIPT_URL,
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded;charset=UTF-8"
-          },
-          body: request.toString()
-        }
-      );
-
-      form.reset();
-
-      if (formMessage) {
-        formMessage.textContent =
-          "Thanks! Your project enquiry has been sent. We'll get back to you within 1–2 business days.";
-
-        formMessage.classList.add("success");
-      }
-
-      showToast(
-        "Project enquiry sent successfully."
-      );
-
-    } catch (error) {
-      console.error(
-        "Webcraft contact form error:",
-        error
-      );
-
-      if (formMessage) {
-        formMessage.textContent =
-          "We couldn't send your enquiry right now. Please try again.";
-
-        formMessage.classList.add("error");
-      }
-
-      showToast(
-        "Unable to send enquiry."
-      );
-
-    } finally {
-      submitButton.disabled = false;
-
-      submitButton.removeAttribute(
-        "aria-busy"
-      );
-
-      submitButton.innerHTML =
-        originalHTML;
-    }
-  });
-}
-/* =========================================================
    INITIALIZE PAGE FEATURES
 ========================================================= */
 
 function initPageFeatures() {
+
   initPortfolioFilters();
+
   initProjectPlanner();
+
   initCaseStudyModal();
+
   initContactForm();
+
 
   console.log(
     "Webcraft page.js initialized."
@@ -579,12 +901,21 @@ function initPageFeatures() {
    START
 ========================================================= */
 
-if (document.readyState === "loading") {
+if (
+  document.readyState ===
+  "loading"
+) {
+
   document.addEventListener(
     "DOMContentLoaded",
     initPageFeatures,
-    { once: true }
+    {
+      once: true
+    }
   );
+
 } else {
+
   initPageFeatures();
+
 }
