@@ -361,22 +361,6 @@ document.addEventListener("keydown", event => {
 
 });
 
-
-/* =========================================================
-   GOOGLE APPS SCRIPT
-   ========================================================= */
-
-
-/*
-  IMPORTANT
-
-  This must be your deployed Google Apps Script
-  Web App URL.
-
-  It must end with:
-
-  /exec
-*/
 /* =========================================================
    GOOGLE APPS SCRIPT
    ========================================================= */
@@ -392,12 +376,17 @@ const GOOGLE_SCRIPT_URL =
 const contactForm = $("#contactForm");
 const formMessage = $("#formMessage");
 
+
 function setFormMessage(message = "", type = "") {
+
   if (!formMessage) return;
 
   formMessage.textContent = message;
 
-  formMessage.classList.remove("success", "error");
+  formMessage.classList.remove(
+    "success",
+    "error"
+  );
 
   if (type) {
     formMessage.classList.add(type);
@@ -407,145 +396,225 @@ function setFormMessage(message = "", type = "") {
 
 if (contactForm) {
 
-  contactForm.addEventListener("submit", async (event) => {
+  contactForm.addEventListener(
+    "submit",
+    async (event) => {
 
-    event.preventDefault();
+      event.preventDefault();
 
-    const submitButton =
-      contactForm.querySelector('button[type="submit"]');
+      const submitButton =
+        contactForm.querySelector(
+          'button[type="submit"]'
+        );
 
-    if (!submitButton) return;
-
-    if (!contactForm.checkValidity()) {
-      contactForm.reportValidity();
-      return;
-    }
-
-    const originalButtonHTML =
-      submitButton.innerHTML;
-
-    submitButton.disabled = true;
-
-    submitButton.innerHTML =
-      "Sending enquiry <span>…</span>";
-
-    setFormMessage();
+      if (!submitButton) return;
 
 
-    /* -----------------------------------------------------
-       COLLECT FORM DATA
-    ----------------------------------------------------- */
+      // Browser validation
+      if (!contactForm.checkValidity()) {
 
-    const formData = new FormData(contactForm);
+        contactForm.reportValidity();
 
-    const enquiry = {
-      name: String(formData.get("name") || "").trim(),
-      email: String(formData.get("email") || "").trim(),
-      goal: String(formData.get("goal") || "").trim(),
-      budget: String(formData.get("budget") || "").trim(),
-      timeline: String(formData.get("timeline") || "").trim(),
-      message: String(formData.get("message") || "").trim()
-    };
+        return;
+      }
 
 
-    /* -----------------------------------------------------
-       VALIDATION
-    ----------------------------------------------------- */
-
-    if (
-      !enquiry.name ||
-      !enquiry.email ||
-      !enquiry.goal ||
-      !enquiry.message
-    ) {
-
-      setFormMessage(
-        "Please complete all required fields.",
-        "error"
-      );
-
-      submitButton.disabled = false;
-      submitButton.innerHTML = originalButtonHTML;
-
-      return;
-    }
+      const originalButtonHTML =
+        submitButton.innerHTML;
 
 
-    /* -----------------------------------------------------
-       SEND TO GOOGLE APPS SCRIPT
-    ----------------------------------------------------- */
-
-    try {
-
-      const response = await fetch(
-        GOOGLE_SCRIPT_URL,
-        {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded;charset=UTF-8"
-          },
-          body: new URLSearchParams({
-            name: enquiry.name,
-            email: enquiry.email,
-            goal: enquiry.goal,
-            budget: enquiry.budget,
-            timeline: enquiry.timeline,
-            message: enquiry.message
-          }).toString()
-        }
-      );
-
-
-      /*
-       * With no-cors, the response is opaque.
-       * We cannot read Google's response.
-       *
-       * Therefore, if fetch itself doesn't throw,
-       * we consider the request delivered.
-       */
-
-      contactForm.reset();
-
-
-      setFormMessage(
-        "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
-        "success"
-      );
-
-      showToast(
-        "Project enquiry sent successfully."
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Webcraft form error:",
-        error
-      );
-
-      setFormMessage(
-        "We couldn't send your enquiry right now. Please try again.",
-        "error"
-      );
-
-      showToast(
-        "Unable to send enquiry."
-      );
-
-
-    } finally {
-
-      submitButton.disabled = false;
+      // Loading
+      submitButton.disabled = true;
 
       submitButton.innerHTML =
-        originalButtonHTML;
+        'Sending enquiry <span>…</span>';
+
+      setFormMessage();
+
+
+      // Collect form data
+      const formData =
+        new FormData(contactForm);
+
+
+      const submission =
+        new URLSearchParams();
+
+
+      submission.append(
+        "name",
+        String(
+          formData.get("name") || ""
+        ).trim()
+      );
+
+      submission.append(
+        "email",
+        String(
+          formData.get("email") || ""
+        ).trim()
+      );
+
+      submission.append(
+        "goal",
+        String(
+          formData.get("goal") || ""
+        ).trim()
+      );
+
+      submission.append(
+        "budget",
+        String(
+          formData.get("budget") || ""
+        ).trim()
+      );
+
+      submission.append(
+        "timeline",
+        String(
+          formData.get("timeline") || ""
+        ).trim()
+      );
+
+      submission.append(
+        "message",
+        String(
+          formData.get("message") || ""
+        ).trim()
+      );
+
+
+      try {
+
+        /*
+         * IMPORTANT:
+         *
+         * Do NOT use no-cors here.
+         */
+
+        const response =
+          await fetch(
+            GOOGLE_SCRIPT_URL,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/x-www-form-urlencoded;charset=UTF-8"
+              },
+
+              body: submission.toString()
+            }
+          );
+
+
+        if (!response.ok) {
+          throw new Error(
+            "Server returned HTTP " +
+            response.status
+          );
+        }
+
+
+        const responseText =
+          await response.text();
+
+
+        console.log(
+          "Apps Script response:",
+          responseText
+        );
+
+
+        let result;
+
+        try {
+
+          result =
+            JSON.parse(responseText);
+
+        } catch {
+
+          throw new Error(
+            "Invalid response from Google Apps Script."
+          );
+
+        }
+
+
+        if (
+          !result ||
+          result.success !== true
+        ) {
+
+          throw new Error(
+            result?.error ||
+            "Google Apps Script rejected the enquiry."
+          );
+
+        }
+
+
+        // =========================
+        // SUCCESS
+        // =========================
+
+        contactForm.reset();
+
+
+        if (typeof resetPlanner === "function") {
+          resetPlanner();
+        }
+
+
+        setFormMessage(
+          "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
+          "success"
+        );
+
+
+        if (typeof showToast === "function") {
+
+          showToast(
+            "Project enquiry sent successfully."
+          );
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Webcraft form error:",
+          error
+        );
+
+
+        setFormMessage(
+          "We couldn't send your enquiry right now. Please try again.",
+          "error"
+        );
+
+
+        if (typeof showToast === "function") {
+
+          showToast(
+            "Unable to send enquiry."
+          );
+
+        }
+
+      } finally {
+
+        submitButton.disabled = false;
+
+        submitButton.innerHTML =
+          originalButtonHTML;
+
+      }
 
     }
-
-  });
+  );
 
 }
 /* =========================================================
