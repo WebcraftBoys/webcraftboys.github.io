@@ -2,37 +2,47 @@
 
 /* =========================================================
    WEBCRAFT — MAIN JAVASCRIPT
-========================================================= */
+   Frontend only
+   ========================================================= */
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
 const $ = (selector, parent = document) =>
   parent.querySelector(selector);
 
 const $$ = (selector, parent = document) =>
-  [...parent.querySelectorAll(selector)];
+  Array.from(parent.querySelectorAll(selector));
 
 
 /* =========================================================
    PAGE LOADER
-========================================================= */
+   ========================================================= */
 
 function hideLoader() {
   const loader = $("#loader");
 
-  if (loader) {
-    loader.classList.add("hidden");
-  }
+  if (!loader) return;
+
+  loader.classList.add("hidden");
 }
 
+
+// Normal page-load fallback
 window.addEventListener("load", () => {
   setTimeout(hideLoader, 400);
 });
 
+
+// Absolute safety fallback
 setTimeout(hideLoader, 2500);
 
 
 /* =========================================================
    MOBILE NAVIGATION
-========================================================= */
+   ========================================================= */
 
 const menuToggle = $(".menu-toggle");
 const navLinks = $("#navLinks");
@@ -58,6 +68,8 @@ if (menuToggle && navLinks) {
 
   });
 
+
+  // Close menu after clicking a link
   $$(".nav-links a", navLinks).forEach(link => {
 
     link.addEventListener("click", () => {
@@ -83,7 +95,7 @@ if (menuToggle && navLinks) {
 
 /* =========================================================
    SCROLL REVEAL
-========================================================= */
+   ========================================================= */
 
 const revealElements = $$(".reveal");
 
@@ -111,6 +123,7 @@ if ("IntersectionObserver" in window) {
       }
     );
 
+
   revealElements.forEach(element => {
     revealObserver.observe(element);
   });
@@ -126,7 +139,7 @@ if ("IntersectionObserver" in window) {
 
 /* =========================================================
    PORTFOLIO FILTERS
-========================================================= */
+   ========================================================= */
 
 const filterButtons = $$(".filter");
 const caseCards = $$(".case-card");
@@ -138,24 +151,28 @@ filterButtons.forEach(button => {
     const selectedFilter =
       button.dataset.filter || "all";
 
+
+    // Active button
     filterButtons.forEach(item => {
       item.classList.remove("active");
     });
 
     button.classList.add("active");
 
+
+    // Filter cards
     caseCards.forEach(card => {
 
       const category =
         card.dataset.category || "";
 
-      const hide =
+      const hidden =
         selectedFilter !== "all" &&
         category !== selectedFilter;
 
       card.classList.toggle(
         "hidden",
-        hide
+        hidden
       );
 
     });
@@ -167,31 +184,46 @@ filterButtons.forEach(button => {
 
 /* =========================================================
    PROJECT PLANNER
-========================================================= */
+   ========================================================= */
 
 const goals = $$(".goal");
 const goalOutput = $("#goalOutput");
 const goalSelect = $("#goalSelect");
 const plannerNext = $("#plannerNext");
 
+const DEFAULT_GOAL =
+  "New business website";
+
+
 function selectGoal(goalButton) {
 
   if (!goalButton) return;
 
+
   const selectedGoal =
     goalButton.dataset.goal || "";
 
+  if (!selectedGoal) return;
+
+
+  // Remove active state
   goals.forEach(goal => {
     goal.classList.remove("active");
   });
 
+
+  // Activate selected goal
   goalButton.classList.add("active");
 
+
+  // Update planner display
   if (goalOutput) {
     goalOutput.textContent =
       selectedGoal;
   }
 
+
+  // Update contact form
   if (goalSelect) {
     goalSelect.value =
       selectedGoal;
@@ -199,6 +231,8 @@ function selectGoal(goalButton) {
 
 }
 
+
+// Goal buttons
 goals.forEach(goal => {
 
   goal.addEventListener("click", () => {
@@ -207,6 +241,8 @@ goals.forEach(goal => {
 
 });
 
+
+// Continue button
 plannerNext?.addEventListener("click", () => {
 
   const activeGoal =
@@ -221,7 +257,7 @@ plannerNext?.addEventListener("click", () => {
 
 /* =========================================================
    CASE STUDY MODAL
-========================================================= */
+   ========================================================= */
 
 const modal = $("#caseModal");
 
@@ -229,24 +265,29 @@ const modalTitle = $("#modalTitle");
 const modalDescription = $("#modalDescription");
 const modalResult = $("#modalResult");
 
+
 function openModal(card) {
 
   if (!modal || !card) return;
+
 
   if (modalTitle) {
     modalTitle.textContent =
       card.dataset.title || "Project";
   }
 
+
   if (modalDescription) {
     modalDescription.textContent =
       card.dataset.description || "";
   }
 
+
   if (modalResult) {
     modalResult.textContent =
       card.dataset.result || "";
   }
+
 
   modal.classList.add("open");
 
@@ -255,12 +296,16 @@ function openModal(card) {
     "false"
   );
 
-  document.body.style.overflow = "hidden";
+  document.body.style.overflow =
+    "hidden";
+
 }
+
 
 function closeModal() {
 
   if (!modal) return;
+
 
   modal.classList.remove("open");
 
@@ -269,9 +314,13 @@ function closeModal() {
     "true"
   );
 
-  document.body.style.overflow = "";
+  document.body.style.overflow =
+    "";
+
 }
 
+
+// Open buttons
 $$(".case-open").forEach(button => {
 
   button.addEventListener("click", () => {
@@ -285,6 +334,8 @@ $$(".case-open").forEach(button => {
 
 });
 
+
+// Close buttons
 $(".modal-close")?.addEventListener(
   "click",
   closeModal
@@ -300,6 +351,8 @@ $(".modal-cta")?.addEventListener(
   closeModal
 );
 
+
+// Escape key
 document.addEventListener("keydown", event => {
 
   if (event.key === "Escape") {
@@ -311,7 +364,19 @@ document.addEventListener("keydown", event => {
 
 /* =========================================================
    GOOGLE APPS SCRIPT
-========================================================= */
+   ========================================================= */
+
+
+/*
+  IMPORTANT
+
+  This must be your deployed Google Apps Script
+  Web App URL.
+
+  It must end with:
+
+  /exec
+*/
 
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwYpb0O9sbxglGrC2GyXXCkPn4Siflbq2LrM3-U8zGIPbaaPJtcOFFW3lh5wyuU_Jr-uA/exec";
@@ -319,21 +384,36 @@ const GOOGLE_SCRIPT_URL =
 
 /* =========================================================
    CONTACT FORM
-========================================================= */
+   ========================================================= */
 
-const contactForm = $("#contactForm");
-const formMessage = $("#formMessage");
+const contactForm =
+  $("#contactForm");
 
-function setFormMessage(message, type = "") {
+const formMessage =
+  $("#formMessage");
+
+
+/* =========================================================
+   FORM MESSAGE
+   ========================================================= */
+
+function setFormMessage(
+  message = "",
+  type = ""
+) {
 
   if (!formMessage) return;
 
-  formMessage.textContent = message;
+
+  formMessage.textContent =
+    message;
+
 
   formMessage.classList.remove(
     "success",
     "error"
   );
+
 
   if (type) {
     formMessage.classList.add(type);
@@ -343,8 +423,42 @@ function setFormMessage(message, type = "") {
 
 
 /* =========================================================
-   SUBMIT CONTACT FORM
-========================================================= */
+   RESET PLANNER
+   ========================================================= */
+
+function resetPlanner() {
+
+  goals.forEach(goal => {
+    goal.classList.remove("active");
+  });
+
+
+  const defaultGoal =
+    $(`.goal[data-goal="${DEFAULT_GOAL}"]`);
+
+
+  if (defaultGoal) {
+    defaultGoal.classList.add("active");
+  }
+
+
+  if (goalOutput) {
+    goalOutput.textContent =
+      DEFAULT_GOAL;
+  }
+
+
+  if (goalSelect) {
+    goalSelect.value =
+      "";
+  }
+
+}
+
+
+/* =========================================================
+   CONTACT FORM SUBMISSION
+   ========================================================= */
 
 if (contactForm) {
 
@@ -353,20 +467,24 @@ if (contactForm) {
     async event => {
 
       event.preventDefault();
-      event.stopPropagation();
 
+
+      /* -----------------------------------------------------
+         Submit button
+         ----------------------------------------------------- */
 
       const submitButton =
         contactForm.querySelector(
           'button[type="submit"]'
         );
 
+
       if (!submitButton) return;
 
 
       /* -----------------------------------------------------
-         VALIDATION
-      ----------------------------------------------------- */
+         Browser validation
+         ----------------------------------------------------- */
 
       if (!contactForm.checkValidity()) {
 
@@ -378,71 +496,80 @@ if (contactForm) {
 
 
       /* -----------------------------------------------------
-         BUTTON STATE
-      ----------------------------------------------------- */
+         Save original button
+         ----------------------------------------------------- */
 
-      const originalButtonHTML =
+      const originalButton =
         submitButton.innerHTML;
 
-      submitButton.disabled = true;
+
+      /* -----------------------------------------------------
+         Loading state
+         ----------------------------------------------------- */
+
+      submitButton.disabled =
+        true;
 
       submitButton.innerHTML =
         'Sending enquiry <span>…</span>';
 
-      setFormMessage("");
+
+      setFormMessage();
 
 
       /* -----------------------------------------------------
-         GET FORM DATA
-      ----------------------------------------------------- */
+         Collect form values
+         ----------------------------------------------------- */
 
       const formData =
         new FormData(contactForm);
 
-      const enquiry = {
 
-        name:
-          String(
-            formData.get("name") || ""
-          ).trim(),
+      const name =
+        String(
+          formData.get("name") || ""
+        ).trim();
 
-        email:
-          String(
-            formData.get("email") || ""
-          ).trim(),
 
-        goal:
-          String(
-            formData.get("goal") || ""
-          ).trim(),
+      const email =
+        String(
+          formData.get("email") || ""
+        ).trim();
 
-        budget:
-          String(
-            formData.get("budget") || ""
-          ).trim(),
 
-        timeline:
-          String(
-            formData.get("timeline") || ""
-          ).trim(),
+      const goal =
+        String(
+          formData.get("goal") || ""
+        ).trim();
 
-        message:
-          String(
-            formData.get("message") || ""
-          ).trim()
 
-      };
+      const budget =
+        String(
+          formData.get("budget") || ""
+        ).trim();
+
+
+      const timeline =
+        String(
+          formData.get("timeline") || ""
+        ).trim();
+
+
+      const message =
+        String(
+          formData.get("message") || ""
+        ).trim();
 
 
       /* -----------------------------------------------------
-         EXTRA VALIDATION
-      ----------------------------------------------------- */
+         Extra validation
+         ----------------------------------------------------- */
 
       if (
-        !enquiry.name ||
-        !enquiry.email ||
-        !enquiry.goal ||
-        !enquiry.message
+        !name ||
+        !email ||
+        !goal ||
+        !message
       ) {
 
         setFormMessage(
@@ -450,10 +577,11 @@ if (contactForm) {
           "error"
         );
 
-        submitButton.disabled = false;
+        submitButton.disabled =
+          false;
 
         submitButton.innerHTML =
-          originalButtonHTML;
+          originalButton;
 
         return;
 
@@ -461,101 +589,91 @@ if (contactForm) {
 
 
       /* -----------------------------------------------------
+         Build standard form request
+         ----------------------------------------------------- */
+
+      const submission =
+        new URLSearchParams();
+
+
+      submission.append(
+        "name",
+        name
+      );
+
+      submission.append(
+        "email",
+        email
+      );
+
+      submission.append(
+        "goal",
+        goal
+      );
+
+      submission.append(
+        "budget",
+        budget
+      );
+
+      submission.append(
+        "timeline",
+        timeline
+      );
+
+      submission.append(
+        "message",
+        message
+      );
+
+
+      /* -----------------------------------------------------
          SEND TO GOOGLE APPS SCRIPT
-      ----------------------------------------------------- */
+         ----------------------------------------------------- */
 
       try {
 
         /*
-         * IMPORTANT:
-         *
-         * We intentionally use:
-         *
-         *     mode: "no-cors"
-         *
-         * and URLSearchParams.
-         *
-         * This avoids the browser trying to perform
-         * a CORS preflight against Google Apps Script.
-         *
-         * We do NOT try to read the response.
-         */
+          We intentionally use no-cors.
 
-        const body =
-          new URLSearchParams();
+          This avoids the browser CORS problem between
+          your website and Google Apps Script.
 
-        body.append(
-          "name",
-          enquiry.name
-        );
+          Your Apps Script receives the data through:
 
-        body.append(
-          "email",
-          enquiry.email
-        );
-
-        body.append(
-          "goal",
-          enquiry.goal
-        );
-
-        body.append(
-          "budget",
-          enquiry.budget
-        );
-
-        body.append(
-          "timeline",
-          enquiry.timeline
-        );
-
-        body.append(
-          "message",
-          enquiry.message
-        );
-
+          e.parameter.name
+          e.parameter.email
+          e.parameter.goal
+          e.parameter.budget
+          e.parameter.timeline
+          e.parameter.message
+        */
 
         await fetch(
           GOOGLE_SCRIPT_URL,
           {
             method: "POST",
             mode: "no-cors",
-            body: body
+            body: submission
           }
         );
 
 
         /* ---------------------------------------------------
            SUCCESS
-        --------------------------------------------------- */
+
+           Because no-cors gives us an opaque response,
+           we cannot inspect Google's JSON response here.
+
+           If fetch completes without throwing, we treat
+           the submission as sent.
+           --------------------------------------------------- */
 
         contactForm.reset();
 
 
-        /* Reset planner */
-
-        goals.forEach(goal => {
-          goal.classList.remove("active");
-        });
-
-
-        const defaultGoal =
-          $(".goal[data-goal='New business website']");
-
-        if (defaultGoal) {
-          defaultGoal.classList.add("active");
-        }
-
-
-        if (goalOutput) {
-          goalOutput.textContent =
-            "New business website";
-        }
-
-
-        if (goalSelect) {
-          goalSelect.value = "";
-        }
+        // Reset planner
+        resetPlanner();
 
 
         setFormMessage(
@@ -587,12 +705,14 @@ if (contactForm) {
           "Unable to send enquiry."
         );
 
+
       } finally {
 
-        submitButton.disabled = false;
+        submitButton.disabled =
+          false;
 
         submitButton.innerHTML =
-          originalButtonHTML;
+          originalButton;
 
       }
 
@@ -603,27 +723,38 @@ if (contactForm) {
 
 
 /* =========================================================
-   TOAST
-========================================================= */
+   TOAST NOTIFICATION
+   ========================================================= */
 
 let toastTimer = null;
 
+
 function showToast(message) {
 
-  const toast = $("#toast");
+  const toast =
+    $("#toast");
 
   if (!toast) return;
 
-  toast.textContent = message;
+
+  toast.textContent =
+    message;
+
 
   toast.classList.add("show");
 
-  clearTimeout(toastTimer);
+
+  clearTimeout(
+    toastTimer
+  );
+
 
   toastTimer =
     setTimeout(() => {
 
-      toast.classList.remove("show");
+      toast.classList.remove(
+        "show"
+      );
 
     }, 2400);
 
@@ -631,104 +762,112 @@ function showToast(message) {
 
 
 /* =========================================================
-   SHARE
-========================================================= */
+   SHARE WEBSITE
+   ========================================================= */
 
 const shareButton =
   $("#shareButton");
 
-if (shareButton) {
 
-  shareButton.addEventListener(
-    "click",
-    async () => {
+shareButton?.addEventListener(
+  "click",
+  async () => {
 
-      const shareData = {
-
-        title: "Webcraft",
-
-        text:
-          "Webcraft — websites that work.",
-
-        url:
-          window.location.href
-
-      };
+    const url =
+      window.location.href;
 
 
-      if (
-        navigator.share &&
-        typeof navigator.share === "function"
-      ) {
+    /* -------------------------------------------------------
+       Native share
+       ------------------------------------------------------- */
 
-        try {
-
-          await navigator.share(
-            shareData
-          );
-
-        } catch (error) {
-
-          if (
-            error?.name !== "AbortError"
-          ) {
-
-            console.error(
-              "Share error:",
-              error
-            );
-
-          }
-
-        }
-
-        return;
-      }
-
+    if (
+      typeof navigator.share ===
+      "function"
+    ) {
 
       try {
 
+        await navigator.share({
+          title: "Webcraft",
+          text: "Webcraft — websites that work.",
+          url
+        });
+
+      } catch (error) {
+
+        // Ignore user cancellation
         if (
-          navigator.clipboard &&
-          navigator.clipboard.writeText
+          error?.name !==
+          "AbortError"
         ) {
 
-          await navigator.clipboard.writeText(
-            window.location.href
-          );
-
-          showToast(
-            "Webcraft link copied."
-          );
-
-        } else {
-
-          throw new Error(
-            "Clipboard unavailable."
+          console.error(
+            "Share error:",
+            error
           );
 
         }
 
-      } catch {
+      }
+
+      return;
+
+    }
+
+
+    /* -------------------------------------------------------
+       Clipboard fallback
+       ------------------------------------------------------- */
+
+    try {
+
+      if (
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText ===
+        "function"
+      ) {
+
+        await navigator.clipboard.writeText(
+          url
+        );
 
         showToast(
-          "Unable to copy the link."
+          "Webcraft link copied."
+        );
+
+      } else {
+
+        throw new Error(
+          "Clipboard unavailable."
         );
 
       }
 
-    }
-  );
+    } catch (error) {
 
-}
+      console.error(
+        "Clipboard error:",
+        error
+      );
+
+      showToast(
+        "Unable to copy the link."
+      );
+
+    }
+
+  }
+);
 
 
 /* =========================================================
    CURRENT YEAR
-========================================================= */
+   ========================================================= */
 
 const yearElement =
   $("#year");
+
 
 if (yearElement) {
 
@@ -739,12 +878,14 @@ if (yearElement) {
 
 
 /* =========================================================
-   MAGNETIC BUTTONS
-========================================================= */
+   MAGNETIC BUTTON EFFECT
+   ========================================================= */
 
 if (
   window.matchMedia &&
-  window.matchMedia("(pointer: fine)").matches
+  window.matchMedia(
+    "(pointer: fine)"
+  ).matches
 ) {
 
   $$(".magnetic").forEach(button => {
@@ -756,6 +897,7 @@ if (
         const rect =
           button.getBoundingClientRect();
 
+
         const x =
           (
             event.clientX -
@@ -763,12 +905,14 @@ if (
             rect.width / 2
           ) * 0.06;
 
+
         const y =
           (
             event.clientY -
             rect.top -
             rect.height / 2
           ) * 0.06;
+
 
         button.style.transform =
           `translate(${x}px, ${y}px)`;
@@ -781,7 +925,8 @@ if (
       "mouseleave",
       () => {
 
-        button.style.transform = "";
+        button.style.transform =
+          "";
 
       }
     );
@@ -792,9 +937,9 @@ if (
 
 
 /* =========================================================
-   DEBUG
-========================================================= */
+   INITIALIZE
+   ========================================================= */
 
 console.log(
-  "Webcraft website initialized successfully."
+  "Webcraft initialized."
 );
