@@ -14,7 +14,6 @@ $$(".filter").forEach(button=>button.addEventListener("click",()=>{
   const filter=button.dataset.filter;
   $$(".case-card").forEach(card=>card.classList.toggle("hidden",filter!=="all"&&card.dataset.category!==filter));
 }));
-```javascript
 // ============================================================
 // PROJECT PLANNER
 // ============================================================
