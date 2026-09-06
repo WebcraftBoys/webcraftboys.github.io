@@ -377,6 +377,9 @@ document.addEventListener("keydown", event => {
 
   /exec
 */
+/* =========================================================
+   GOOGLE APPS SCRIPT
+   ========================================================= */
 
 const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzg0WaVNhj0a-2WgIe3JLodHkXj-x-f6GA9duvootqGRjpETwgC2f7xnbi8Psp4e67YCg/exec";
@@ -386,342 +389,165 @@ const GOOGLE_SCRIPT_URL =
    CONTACT FORM
    ========================================================= */
 
-const contactForm =
-  $("#contactForm");
+const contactForm = $("#contactForm");
+const formMessage = $("#formMessage");
 
-const formMessage =
-  $("#formMessage");
-
-
-/* =========================================================
-   FORM MESSAGE
-   ========================================================= */
-
-function setFormMessage(
-  message = "",
-  type = ""
-) {
-
+function setFormMessage(message = "", type = "") {
   if (!formMessage) return;
 
+  formMessage.textContent = message;
 
-  formMessage.textContent =
-    message;
-
-
-  formMessage.classList.remove(
-    "success",
-    "error"
-  );
-
+  formMessage.classList.remove("success", "error");
 
   if (type) {
     formMessage.classList.add(type);
   }
-
 }
 
-
-/* =========================================================
-   RESET PLANNER
-   ========================================================= */
-
-function resetPlanner() {
-
-  goals.forEach(goal => {
-    goal.classList.remove("active");
-  });
-
-
-  const defaultGoal =
-    $(`.goal[data-goal="${DEFAULT_GOAL}"]`);
-
-
-  if (defaultGoal) {
-    defaultGoal.classList.add("active");
-  }
-
-
-  if (goalOutput) {
-    goalOutput.textContent =
-      DEFAULT_GOAL;
-  }
-
-
-  if (goalSelect) {
-    goalSelect.value =
-      "";
-  }
-
-}
-
-
-/* =========================================================
-   CONTACT FORM SUBMISSION
-   ========================================================= */
 
 if (contactForm) {
 
-  contactForm.addEventListener(
-    "submit",
-    async event => {
+  contactForm.addEventListener("submit", async (event) => {
 
-      event.preventDefault();
+    event.preventDefault();
 
+    const submitButton =
+      contactForm.querySelector('button[type="submit"]');
 
-      /* -----------------------------------------------------
-         Submit button
-         ----------------------------------------------------- */
+    if (!submitButton) return;
 
-      const submitButton =
-        contactForm.querySelector(
-          'button[type="submit"]'
-        );
+    if (!contactForm.checkValidity()) {
+      contactForm.reportValidity();
+      return;
+    }
 
+    const originalButtonHTML =
+      submitButton.innerHTML;
 
-      if (!submitButton) return;
+    submitButton.disabled = true;
 
+    submitButton.innerHTML =
+      "Sending enquiry <span>…</span>";
 
-      /* -----------------------------------------------------
-         Browser validation
-         ----------------------------------------------------- */
-
-      if (!contactForm.checkValidity()) {
-
-        contactForm.reportValidity();
-
-        return;
-
-      }
+    setFormMessage();
 
 
-      /* -----------------------------------------------------
-         Save original button
-         ----------------------------------------------------- */
+    /* -----------------------------------------------------
+       COLLECT FORM DATA
+    ----------------------------------------------------- */
 
-      const originalButton =
-        submitButton.innerHTML;
+    const formData = new FormData(contactForm);
+
+    const enquiry = {
+      name: String(formData.get("name") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      goal: String(formData.get("goal") || "").trim(),
+      budget: String(formData.get("budget") || "").trim(),
+      timeline: String(formData.get("timeline") || "").trim(),
+      message: String(formData.get("message") || "").trim()
+    };
 
 
-      /* -----------------------------------------------------
-         Loading state
-         ----------------------------------------------------- */
+    /* -----------------------------------------------------
+       VALIDATION
+    ----------------------------------------------------- */
 
-      submitButton.disabled =
-        true;
+    if (
+      !enquiry.name ||
+      !enquiry.email ||
+      !enquiry.goal ||
+      !enquiry.message
+    ) {
+
+      setFormMessage(
+        "Please complete all required fields.",
+        "error"
+      );
+
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalButtonHTML;
+
+      return;
+    }
+
+
+    /* -----------------------------------------------------
+       SEND TO GOOGLE APPS SCRIPT
+    ----------------------------------------------------- */
+
+    try {
+
+      const response = await fetch(
+        GOOGLE_SCRIPT_URL,
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+          body: new URLSearchParams({
+            name: enquiry.name,
+            email: enquiry.email,
+            goal: enquiry.goal,
+            budget: enquiry.budget,
+            timeline: enquiry.timeline,
+            message: enquiry.message
+          }).toString()
+        }
+      );
+
+
+      /*
+       * With no-cors, the response is opaque.
+       * We cannot read Google's response.
+       *
+       * Therefore, if fetch itself doesn't throw,
+       * we consider the request delivered.
+       */
+
+      contactForm.reset();
+
+
+      setFormMessage(
+        "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
+        "success"
+      );
+
+      showToast(
+        "Project enquiry sent successfully."
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Webcraft form error:",
+        error
+      );
+
+      setFormMessage(
+        "We couldn't send your enquiry right now. Please try again.",
+        "error"
+      );
+
+      showToast(
+        "Unable to send enquiry."
+      );
+
+
+    } finally {
+
+      submitButton.disabled = false;
 
       submitButton.innerHTML =
-        'Sending enquiry <span>…</span>';
-
-
-      setFormMessage();
-
-
-      /* -----------------------------------------------------
-         Collect form values
-         ----------------------------------------------------- */
-
-      const formData =
-        new FormData(contactForm);
-
-
-      const name =
-        String(
-          formData.get("name") || ""
-        ).trim();
-
-
-      const email =
-        String(
-          formData.get("email") || ""
-        ).trim();
-
-
-      const goal =
-        String(
-          formData.get("goal") || ""
-        ).trim();
-
-
-      const budget =
-        String(
-          formData.get("budget") || ""
-        ).trim();
-
-
-      const timeline =
-        String(
-          formData.get("timeline") || ""
-        ).trim();
-
-
-      const message =
-        String(
-          formData.get("message") || ""
-        ).trim();
-
-
-      /* -----------------------------------------------------
-         Extra validation
-         ----------------------------------------------------- */
-
-      if (
-        !name ||
-        !email ||
-        !goal ||
-        !message
-      ) {
-
-        setFormMessage(
-          "Please complete all required fields.",
-          "error"
-        );
-
-        submitButton.disabled =
-          false;
-
-        submitButton.innerHTML =
-          originalButton;
-
-        return;
-
-      }
-
-
-      /* -----------------------------------------------------
-         Build standard form request
-         ----------------------------------------------------- */
-
-      const submission =
-        new URLSearchParams();
-
-
-      submission.append(
-        "name",
-        name
-      );
-
-      submission.append(
-        "email",
-        email
-      );
-
-      submission.append(
-        "goal",
-        goal
-      );
-
-      submission.append(
-        "budget",
-        budget
-      );
-
-      submission.append(
-        "timeline",
-        timeline
-      );
-
-      submission.append(
-        "message",
-        message
-      );
-
-
-      /* -----------------------------------------------------
-         SEND TO GOOGLE APPS SCRIPT
-         ----------------------------------------------------- */
-
-      try {
-
-        /*
-          We intentionally use no-cors.
-
-          This avoids the browser CORS problem between
-          your website and Google Apps Script.
-
-          Your Apps Script receives the data through:
-
-          e.parameter.name
-          e.parameter.email
-          e.parameter.goal
-          e.parameter.budget
-          e.parameter.timeline
-          e.parameter.message
-        */
-
-        await fetch(
-          GOOGLE_SCRIPT_URL,
-          {
-            method: "POST",
-            mode: "no-cors",
-            body: submission
-          }
-        );
-
-
-        /* ---------------------------------------------------
-           SUCCESS
-
-           Because no-cors gives us an opaque response,
-           we cannot inspect Google's JSON response here.
-
-           If fetch completes without throwing, we treat
-           the submission as sent.
-           --------------------------------------------------- */
-
-        contactForm.reset();
-
-
-        // Reset planner
-        resetPlanner();
-
-
-        setFormMessage(
-          "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
-          "success"
-        );
-
-
-        showToast(
-          "Project enquiry sent successfully."
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Webcraft form error:",
-          error
-        );
-
-
-        setFormMessage(
-          "We couldn't send your enquiry right now. Please try again.",
-          "error"
-        );
-
-
-        showToast(
-          "Unable to send enquiry."
-        );
-
-
-      } finally {
-
-        submitButton.disabled =
-          false;
-
-        submitButton.innerHTML =
-          originalButton;
-
-      }
+        originalButtonHTML;
 
     }
-  );
+
+  });
 
 }
-
-
 /* =========================================================
    TOAST NOTIFICATION
    ========================================================= */
