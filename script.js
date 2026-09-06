@@ -71,7 +71,7 @@ menuToggle.setAttribute(
 
 });
 
-$$$(".nav-links a", navLinks).forEach(link => {
+$$(".nav-links a", navLinks).forEach(link => {
 
   link.addEventListener("click", () => {
 
