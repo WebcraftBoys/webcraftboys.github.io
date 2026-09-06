@@ -1,114 +1,113 @@
-
 "use strict";
+
 /* =========================================================
-HELPERS
-========================================================= */
+   WEBCRAFT — MAIN JAVASCRIPT
+   Frontend only
+   ========================================================= */
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
 const $ = (selector, parent = document) =>
-parent.querySelector(selector);
+  parent.querySelector(selector);
 
 const $$ = (selector, parent = document) =>
-[...parent.querySelectorAll(selector)];
+  Array.from(parent.querySelectorAll(selector));
+
 
 /* =========================================================
-PAGE LOADER
-========================================================= */
+   PAGE LOADER
+   ========================================================= */
 
 function hideLoader() {
-const loader = $("#loader");
+  const loader = $("#loader");
 
-if (!loader) return;
+  if (!loader) return;
 
-loader.classList.add("hidden");
+  loader.classList.add("hidden");
 }
 
-/*
-Hide loader when everything is ready.
-The timeout is only a fallback so the website
-can never remain stuck on the loading screen.
-*/
 
+// Normal page-load fallback
 window.addEventListener("load", () => {
-setTimeout(hideLoader, 400);
+  setTimeout(hideLoader, 400);
 });
 
-/*
-Safety fallback.
 
-If something external takes too long to load,
-remove the loader anyway.
-*/
-
+// Absolute safety fallback
 setTimeout(hideLoader, 2500);
 
+
 /* =========================================================
-MOBILE NAVIGATION
-========================================================= */
+   MOBILE NAVIGATION
+   ========================================================= */
 
 const menuToggle = $(".menu-toggle");
 const navLinks = $("#navLinks");
 
 if (menuToggle && navLinks) {
 
-menuToggle.addEventListener("click", () => {
+  menuToggle.addEventListener("click", () => {
 
-```
-const isOpen =
-  navLinks.classList.toggle("open");
-
-menuToggle.setAttribute(
-  "aria-expanded",
-  String(isOpen)
-);
-
-menuToggle.setAttribute(
-  "aria-label",
-  isOpen
-    ? "Close navigation"
-    : "Open navigation"
-);
-```
-
-});
-
-$$(".nav-links a", navLinks).forEach(link => {
-
-  link.addEventListener("click", () => {
-
-    navLinks.classList.remove("open");
+    const isOpen =
+      navLinks.classList.toggle("open");
 
     menuToggle.setAttribute(
       "aria-expanded",
-      "false"
+      String(isOpen)
     );
 
     menuToggle.setAttribute(
       "aria-label",
-      "Open navigation"
+      isOpen
+        ? "Close navigation"
+        : "Open navigation"
     );
 
   });
 
-});
+
+  // Close menu after clicking a link
+  $$(".nav-links a", navLinks).forEach(link => {
+
+    link.addEventListener("click", () => {
+
+      navLinks.classList.remove("open");
+
+      menuToggle.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
+      menuToggle.setAttribute(
+        "aria-label",
+        "Open navigation"
+      );
+
+    });
+
+  });
 
 }
 
 
 /* =========================================================
- SCROLL REVEAL
-========================================================= */
+   SCROLL REVEAL
+   ========================================================= */
 
 const revealElements = $$(".reveal");
 
 if ("IntersectionObserver" in window) {
 
-const revealObserver =
-  new IntersectionObserver(
-    entries => {
+  const revealObserver =
+    new IntersectionObserver(
+      entries => {
 
-      entries.forEach(entry => {
+        entries.forEach(entry => {
 
-        if (entry.isIntersecting) {
+          if (!entry.isIntersecting) return;
 
           entry.target.classList.add("visible");
 
@@ -116,196 +115,149 @@ const revealObserver =
             entry.target
           );
 
-        }
+        });
 
-      });
-
-    },
-    {
-      threshold: 0.12
-    }
-  );
+      },
+      {
+        threshold: 0.12
+      }
+    );
 
 
-revealElements.forEach(element => {
-
-  revealObserver.observe(element);
-
-});
+  revealElements.forEach(element => {
+    revealObserver.observe(element);
+  });
 
 } else {
 
-/*
-  Older browsers:
-  simply show everything.
-*/
-
-revealElements.forEach(element => {
-
-  element.classList.add("visible");
-
-});
+  revealElements.forEach(element => {
+    element.classList.add("visible");
+  });
 
 }
 
 
 /* =========================================================
- PORTFOLIO FILTERS
-========================================================= */
+   PORTFOLIO FILTERS
+   ========================================================= */
 
 const filterButtons = $$(".filter");
 const caseCards = $$(".case-card");
 
 filterButtons.forEach(button => {
 
-button.addEventListener("click", () => {
+  button.addEventListener("click", () => {
 
-  const selectedFilter =
-    button.dataset.filter || "all";
-
-
-  /*
-    Update active button.
-  */
-
-  filterButtons.forEach(item => {
-
-    item.classList.remove("active");
-
-  });
-
-  button.classList.add("active");
+    const selectedFilter =
+      button.dataset.filter || "all";
 
 
-  /*
-    Show / hide portfolio cards.
-  */
+    // Active button
+    filterButtons.forEach(item => {
+      item.classList.remove("active");
+    });
 
-  caseCards.forEach(card => {
+    button.classList.add("active");
 
-    const category =
-      card.dataset.category || "";
 
-    const shouldHide =
-      selectedFilter !== "all" &&
-      category !== selectedFilter;
+    // Filter cards
+    caseCards.forEach(card => {
 
-    card.classList.toggle(
-      "hidden",
-      shouldHide
-    );
+      const category =
+        card.dataset.category || "";
+
+      const hidden =
+        selectedFilter !== "all" &&
+        category !== selectedFilter;
+
+      card.classList.toggle(
+        "hidden",
+        hidden
+      );
+
+    });
 
   });
-
-});
 
 });
 
 
 /* =========================================================
- PROJECT PLANNER
-========================================================= */
+   PROJECT PLANNER
+   ========================================================= */
 
 const goals = $$(".goal");
 const goalOutput = $("#goalOutput");
 const goalSelect = $("#goalSelect");
 const plannerNext = $("#plannerNext");
 
+const DEFAULT_GOAL =
+  "New business website";
+
 
 function selectGoal(goalButton) {
 
-if (!goalButton) return;
+  if (!goalButton) return;
 
-const selectedGoal =
-  goalButton.dataset.goal || "";
 
-/*
-  Remove active state.
-*/
+  const selectedGoal =
+    goalButton.dataset.goal || "";
 
+  if (!selectedGoal) return;
+
+
+  // Remove active state
+  goals.forEach(goal => {
+    goal.classList.remove("active");
+  });
+
+
+  // Activate selected goal
+  goalButton.classList.add("active");
+
+
+  // Update planner display
+  if (goalOutput) {
+    goalOutput.textContent =
+      selectedGoal;
+  }
+
+
+  // Update contact form
+  if (goalSelect) {
+    goalSelect.value =
+      selectedGoal;
+  }
+
+}
+
+
+// Goal buttons
 goals.forEach(goal => {
 
-  goal.classList.remove("active");
+  goal.addEventListener("click", () => {
+    selectGoal(goal);
+  });
 
 });
 
 
-/*
-  Activate selected goal.
-*/
-
-goalButton.classList.add("active");
-
-
-/*
-  Update planner label.
-*/
-
-if (goalOutput) {
-
-  goalOutput.textContent =
-    selectedGoal;
-
-}
-
-
-/*
-  Update contact form.
-*/
-
-if (goalSelect) {
-
-  goalSelect.value =
-    selectedGoal;
-
-}
-
-}
-
-
-/*
-Goal buttons.
-*/
-
-goals.forEach(goal => {
-
-goal.addEventListener("click", () => {
-
-  selectGoal(goal);
-
-});
-
-});
-
-
-/*
-Continue button.
-
-The HTML anchor automatically scrolls to #contact.
-We only make sure the selected value is carried over.
-*/
-
-if (plannerNext) {
-
-plannerNext.addEventListener("click", () => {
+// Continue button
+plannerNext?.addEventListener("click", () => {
 
   const activeGoal =
     $(".goal.active");
 
   if (activeGoal) {
-
     selectGoal(activeGoal);
-
   }
 
 });
 
-}
-
 
 /* =========================================================
- CASE STUDY MODAL
-========================================================= */
+   CASE STUDY MODAL
+   ========================================================= */
 
 const modal = $("#caseModal");
 
@@ -313,550 +265,538 @@ const modalTitle = $("#modalTitle");
 const modalDescription = $("#modalDescription");
 const modalResult = $("#modalResult");
 
-const modalClose = $(".modal-close");
-const modalBackdrop = $(".modal-backdrop");
-const modalCTA = $(".modal-cta");
-
 
 function openModal(card) {
 
-if (!modal || !card) return;
+  if (!modal || !card) return;
 
 
-if (modalTitle) {
-
-  modalTitle.textContent =
-    card.dataset.title || "Project";
-
-}
+  if (modalTitle) {
+    modalTitle.textContent =
+      card.dataset.title || "Project";
+  }
 
 
-if (modalDescription) {
-
-  modalDescription.textContent =
-    card.dataset.description || "";
-
-}
+  if (modalDescription) {
+    modalDescription.textContent =
+      card.dataset.description || "";
+  }
 
 
-if (modalResult) {
-
-  modalResult.textContent =
-    card.dataset.result || "";
-
-}
+  if (modalResult) {
+    modalResult.textContent =
+      card.dataset.result || "";
+  }
 
 
-modal.classList.add("open");
+  modal.classList.add("open");
 
-modal.setAttribute(
-  "aria-hidden",
-  "false"
-);
+  modal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
 
-document.body.style.overflow =
-  "hidden";
+  document.body.style.overflow =
+    "hidden";
 
 }
 
 
 function closeModal() {
 
-if (!modal) return;
+  if (!modal) return;
 
-modal.classList.remove("open");
 
-modal.setAttribute(
-  "aria-hidden",
-  "true"
-);
+  modal.classList.remove("open");
 
-document.body.style.overflow =
-  "";
+  modal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  document.body.style.overflow =
+    "";
 
 }
 
 
+// Open buttons
 $$(".case-open").forEach(button => {
 
-button.addEventListener("click", () => {
+  button.addEventListener("click", () => {
 
-  const card =
-    button.closest(".case-card");
+    const card =
+      button.closest(".case-card");
 
-  openModal(card);
+    openModal(card);
+
+  });
 
 });
 
-});
 
-
-modalClose?.addEventListener(
-"click",
-closeModal
+// Close buttons
+$(".modal-close")?.addEventListener(
+  "click",
+  closeModal
 );
 
-modalBackdrop?.addEventListener(
-"click",
-closeModal
+$(".modal-backdrop")?.addEventListener(
+  "click",
+  closeModal
 );
 
-modalCTA?.addEventListener(
-"click",
-closeModal
+$(".modal-cta")?.addEventListener(
+  "click",
+  closeModal
 );
 
 
-document.addEventListener(
-"keydown",
-event => {
+// Escape key
+document.addEventListener("keydown", event => {
 
   if (event.key === "Escape") {
-
     closeModal();
-
   }
 
-}
-);
+});
 
 
 /* =========================================================
- GOOGLE APPS SCRIPT
-========================================================= */
+   GOOGLE APPS SCRIPT
+   ========================================================= */
 
 
 /*
-YOUR GOOGLE APPS SCRIPT WEB APP URL.
+  IMPORTANT
 
-Keep the /exec at the end.
+  This must be your deployed Google Apps Script
+  Web App URL.
+
+  It must end with:
+
+  /exec
 */
 
 const GOOGLE_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbwYpb0O9sbxglGrC2GyXXCkPn4Siflbq2LrM3-U8zGIPbaaPJtcOFFW3lh5wyuU_Jr-uA/exec";
+  "https://script.google.com/macros/s/AKfycbwYpb0O9sbxglGrC2GyXXCkPn4Siflbq2LrM3-U8zGIPbaaPJtcOFFW3lh5wyuU_Jr-uA/exec";
 
 
 /* =========================================================
- CONTACT FORM
-========================================================= */
+   CONTACT FORM
+   ========================================================= */
 
-const contactForm = $("#contactForm");
-const formMessage = $("#formMessage");
+const contactForm =
+  $("#contactForm");
 
-
-function setFormMessage(message, type = "") {
-
-if (!formMessage) return;
-
-formMessage.textContent =
-  message;
-
-formMessage.classList.remove(
-  "success",
-  "error"
-);
+const formMessage =
+  $("#formMessage");
 
 
-if (type) {
+/* =========================================================
+   FORM MESSAGE
+   ========================================================= */
 
-  formMessage.classList.add(type);
+function setFormMessage(
+  message = "",
+  type = ""
+) {
+
+  if (!formMessage) return;
+
+
+  formMessage.textContent =
+    message;
+
+
+  formMessage.classList.remove(
+    "success",
+    "error"
+  );
+
+
+  if (type) {
+    formMessage.classList.add(type);
+  }
 
 }
 
+
+/* =========================================================
+   RESET PLANNER
+   ========================================================= */
+
+function resetPlanner() {
+
+  goals.forEach(goal => {
+    goal.classList.remove("active");
+  });
+
+
+  const defaultGoal =
+    $(`.goal[data-goal="${DEFAULT_GOAL}"]`);
+
+
+  if (defaultGoal) {
+    defaultGoal.classList.add("active");
+  }
+
+
+  if (goalOutput) {
+    goalOutput.textContent =
+      DEFAULT_GOAL;
+  }
+
+
+  if (goalSelect) {
+    goalSelect.value =
+      "";
+  }
+
 }
 
 
-/*
-Submit enquiry.
-*/
+/* =========================================================
+   CONTACT FORM SUBMISSION
+   ========================================================= */
 
 if (contactForm) {
 
-contactForm.addEventListener(
-  "submit",
-  async event => {
+  contactForm.addEventListener(
+    "submit",
+    async event => {
 
-    event.preventDefault();
-
-
-    const submitButton =
-      contactForm.querySelector(
-        'button[type="submit"]'
-      );
+      event.preventDefault();
 
 
-    if (!submitButton) return;
+      /* -----------------------------------------------------
+         Submit button
+         ----------------------------------------------------- */
+
+      const submitButton =
+        contactForm.querySelector(
+          'button[type="submit"]'
+        );
 
 
-    /*
-      Browser validation.
-    */
-
-    if (!contactForm.checkValidity()) {
-
-      contactForm.reportValidity();
-
-      return;
-
-    }
+      if (!submitButton) return;
 
 
-    /*
-      Save original button.
-    */
+      /* -----------------------------------------------------
+         Browser validation
+         ----------------------------------------------------- */
 
-    const originalButton =
-      submitButton.innerHTML;
+      if (!contactForm.checkValidity()) {
 
+        contactForm.reportValidity();
 
-    /*
-      Loading state.
-    */
+        return;
 
-    submitButton.disabled =
-      true;
-
-    submitButton.innerHTML =
-      "Sending enquiry <span>…</span>";
+      }
 
 
-    setFormMessage("");
+      /* -----------------------------------------------------
+         Save original button
+         ----------------------------------------------------- */
+
+      const originalButton =
+        submitButton.innerHTML;
 
 
-    /*
-      Collect form.
-    */
-
-    const formData =
-      new FormData(contactForm);
-
-
-    const enquiry = {
-
-      name:
-        String(
-          formData.get("name") || ""
-        ).trim(),
-
-      email:
-        String(
-          formData.get("email") || ""
-        ).trim(),
-
-      goal:
-        String(
-          formData.get("goal") || ""
-        ).trim(),
-
-      budget:
-        String(
-          formData.get("budget") || ""
-        ).trim(),
-
-      timeline:
-        String(
-          formData.get("timeline") || ""
-        ).trim(),
-
-      message:
-        String(
-          formData.get("message") || ""
-        ).trim()
-
-    };
-
-
-    /*
-      Extra validation.
-    */
-
-    if (
-      !enquiry.name ||
-      !enquiry.email ||
-      !enquiry.goal ||
-      !enquiry.message
-    ) {
-
-      setFormMessage(
-        "Please complete all required fields.",
-        "error"
-      );
+      /* -----------------------------------------------------
+         Loading state
+         ----------------------------------------------------- */
 
       submitButton.disabled =
-        false;
+        true;
 
       submitButton.innerHTML =
-        originalButton;
-
-      return;
-
-    }
+        'Sending enquiry <span>…</span>';
 
 
-    try {
+      setFormMessage();
 
-      /*
-        Send to Google Apps Script.
 
-        IMPORTANT:
-        We use text/plain instead of
-        application/json to avoid a CORS
-        preflight request with Apps Script.
-      */
+      /* -----------------------------------------------------
+         Collect form values
+         ----------------------------------------------------- */
 
-      const response =
+      const formData =
+        new FormData(contactForm);
+
+
+      const name =
+        String(
+          formData.get("name") || ""
+        ).trim();
+
+
+      const email =
+        String(
+          formData.get("email") || ""
+        ).trim();
+
+
+      const goal =
+        String(
+          formData.get("goal") || ""
+        ).trim();
+
+
+      const budget =
+        String(
+          formData.get("budget") || ""
+        ).trim();
+
+
+      const timeline =
+        String(
+          formData.get("timeline") || ""
+        ).trim();
+
+
+      const message =
+        String(
+          formData.get("message") || ""
+        ).trim();
+
+
+      /* -----------------------------------------------------
+         Extra validation
+         ----------------------------------------------------- */
+
+      if (
+        !name ||
+        !email ||
+        !goal ||
+        !message
+      ) {
+
+        setFormMessage(
+          "Please complete all required fields.",
+          "error"
+        );
+
+        submitButton.disabled =
+          false;
+
+        submitButton.innerHTML =
+          originalButton;
+
+        return;
+
+      }
+
+
+      /* -----------------------------------------------------
+         Build standard form request
+         ----------------------------------------------------- */
+
+      const submission =
+        new URLSearchParams();
+
+
+      submission.append(
+        "name",
+        name
+      );
+
+      submission.append(
+        "email",
+        email
+      );
+
+      submission.append(
+        "goal",
+        goal
+      );
+
+      submission.append(
+        "budget",
+        budget
+      );
+
+      submission.append(
+        "timeline",
+        timeline
+      );
+
+      submission.append(
+        "message",
+        message
+      );
+
+
+      /* -----------------------------------------------------
+         SEND TO GOOGLE APPS SCRIPT
+         ----------------------------------------------------- */
+
+      try {
+
+        /*
+          We intentionally use no-cors.
+
+          This avoids the browser CORS problem between
+          your website and Google Apps Script.
+
+          Your Apps Script receives the data through:
+
+          e.parameter.name
+          e.parameter.email
+          e.parameter.goal
+          e.parameter.budget
+          e.parameter.timeline
+          e.parameter.message
+        */
+
         await fetch(
           GOOGLE_SCRIPT_URL,
           {
             method: "POST",
-
-            headers: {
-              "Content-Type":
-                "text/plain;charset=utf-8"
-            },
-
-            body:
-              JSON.stringify(enquiry)
+            mode: "no-cors",
+            body: submission
           }
         );
 
 
-      /*
-        Read response as text first.
+        /* ---------------------------------------------------
+           SUCCESS
 
-        This prevents JSON parsing errors
-        from breaking the form if Google
-        returns a non-JSON response.
-      */
+           Because no-cors gives us an opaque response,
+           we cannot inspect Google's JSON response here.
 
-      const responseText =
-        await response.text();
+           If fetch completes without throwing, we treat
+           the submission as sent.
+           --------------------------------------------------- */
 
-
-      let result = null;
+        contactForm.reset();
 
 
-      try {
+        // Reset planner
+        resetPlanner();
 
-        result =
-          JSON.parse(responseText);
 
-      } catch {
-
-        /*
-          If Apps Script returned something
-          unexpected, throw a useful error.
-        */
-
-        throw new Error(
-          "The server returned an invalid response."
+        setFormMessage(
+          "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
+          "success"
         );
 
-      }
 
-
-      /*
-        Check server result.
-      */
-
-      if (
-        !response.ok ||
-        !result ||
-        result.success !== true
-      ) {
-
-        throw new Error(
-          result?.error ||
-          "Unable to send the enquiry."
+        showToast(
+          "Project enquiry sent successfully."
         );
 
-      }
 
+      } catch (error) {
 
-      /*
-        SUCCESS
-      */
-
-      contactForm.reset();
-
-
-      /*
-        Reset planner.
-      */
-
-      goals.forEach(goal => {
-
-        goal.classList.remove(
-          "active"
+        console.error(
+          "Webcraft form error:",
+          error
         );
 
-      });
 
-
-      const defaultGoal =
-        $(".goal[data-goal='New business website']");
-
-
-      if (defaultGoal) {
-
-        defaultGoal.classList.add(
-          "active"
+        setFormMessage(
+          "We couldn't send your enquiry right now. Please try again.",
+          "error"
         );
 
+
+        showToast(
+          "Unable to send enquiry."
+        );
+
+
+      } finally {
+
+        submitButton.disabled =
+          false;
+
+        submitButton.innerHTML =
+          originalButton;
+
       }
-
-
-      if (goalOutput) {
-
-        goalOutput.textContent =
-          "New business website";
-
-      }
-
-
-      if (goalSelect) {
-
-        goalSelect.value = "";
-
-      }
-
-
-      setFormMessage(
-        "Thanks! Your project enquiry has been sent. We'll get back to you within 1 business day.",
-        "success"
-      );
-
-
-      showToast(
-        "Project enquiry sent."
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Webcraft form error:",
-        error
-      );
-
-
-      setFormMessage(
-        "We couldn't send your enquiry right now. Please try again.",
-        "error"
-      );
-
-
-      showToast(
-        "Unable to send enquiry."
-      );
-
-
-    } finally {
-
-      /*
-        Restore button.
-      */
-
-      submitButton.disabled =
-        false;
-
-      submitButton.innerHTML =
-        originalButton;
 
     }
-
-  }
-);
+  );
 
 }
 
 
 /* =========================================================
- TOAST
-========================================================= */
+   TOAST NOTIFICATION
+   ========================================================= */
 
 let toastTimer = null;
 
 
 function showToast(message) {
 
-const toast = $("#toast");
+  const toast =
+    $("#toast");
 
-if (!toast) return;
-
-
-toast.textContent =
-  message;
-
-toast.classList.add("show");
+  if (!toast) return;
 
 
-clearTimeout(toastTimer);
+  toast.textContent =
+    message;
 
 
-toastTimer =
-  setTimeout(() => {
+  toast.classList.add("show");
 
-    toast.classList.remove(
-      "show"
-    );
 
-  }, 2400);
+  clearTimeout(
+    toastTimer
+  );
+
+
+  toastTimer =
+    setTimeout(() => {
+
+      toast.classList.remove(
+        "show"
+      );
+
+    }, 2400);
 
 }
 
 
 /* =========================================================
- SHARE
-========================================================= */
+   SHARE WEBSITE
+   ========================================================= */
 
 const shareButton =
-$("#shareButton");
+  $("#shareButton");
 
 
-if (shareButton) {
-
-shareButton.addEventListener(
+shareButton?.addEventListener(
   "click",
   async () => {
 
-    const shareData = {
-
-      title:
-        "Webcraft",
-
-      text:
-        "Webcraft — websites that work.",
-
-      url:
-        window.location.href
-
-    };
+    const url =
+      window.location.href;
 
 
-    /*
-      Native share.
-    */
+    /* -------------------------------------------------------
+       Native share
+       ------------------------------------------------------- */
 
     if (
-      navigator.share &&
       typeof navigator.share ===
-        "function"
+      "function"
     ) {
 
       try {
 
-        await navigator.share(
-          shareData
-        );
+        await navigator.share({
+          title: "Webcraft",
+          text: "Webcraft — websites that work.",
+          url
+        });
 
       } catch (error) {
 
-        /*
-          User cancelled.
-          Nothing to do.
-        */
-
+        // Ignore user cancellation
         if (
           error?.name !==
           "AbortError"
@@ -876,19 +816,20 @@ shareButton.addEventListener(
     }
 
 
-    /*
-      Clipboard fallback.
-    */
+    /* -------------------------------------------------------
+       Clipboard fallback
+       ------------------------------------------------------- */
 
     try {
 
       if (
         navigator.clipboard &&
-        navigator.clipboard.writeText
+        typeof navigator.clipboard.writeText ===
+        "function"
       ) {
 
         await navigator.clipboard.writeText(
-          window.location.href
+          url
         );
 
         showToast(
@@ -903,7 +844,12 @@ shareButton.addEventListener(
 
       }
 
-    } catch {
+    } catch (error) {
+
+      console.error(
+        "Clipboard error:",
+        error
+      );
 
       showToast(
         "Unable to copy the link."
@@ -914,87 +860,86 @@ shareButton.addEventListener(
   }
 );
 
-}
-
 
 /* =========================================================
- CURRENT YEAR
-========================================================= */
+   CURRENT YEAR
+   ========================================================= */
 
 const yearElement =
-$("#year");
+  $("#year");
+
 
 if (yearElement) {
 
-yearElement.textContent =
-  new Date().getFullYear();
+  yearElement.textContent =
+    new Date().getFullYear();
 
 }
 
 
 /* =========================================================
- MAGNETIC BUTTONS
-========================================================= */
+   MAGNETIC BUTTON EFFECT
+   ========================================================= */
 
 if (
-window.matchMedia &&
-window.matchMedia(
-  "(pointer: fine)"
-).matches
+  window.matchMedia &&
+  window.matchMedia(
+    "(pointer: fine)"
+  ).matches
 ) {
 
-$$(".magnetic").forEach(button => {
+  $$(".magnetic").forEach(button => {
 
-  button.addEventListener(
-    "mousemove",
-    event => {
+    button.addEventListener(
+      "mousemove",
+      event => {
 
-      const rect =
-        button.getBoundingClientRect();
-
-
-      const x =
-        (
-          event.clientX -
-          rect.left -
-          rect.width / 2
-        ) * 0.06;
+        const rect =
+          button.getBoundingClientRect();
 
 
-      const y =
-        (
-          event.clientY -
-          rect.top -
-          rect.height / 2
-        ) * 0.06;
+        const x =
+          (
+            event.clientX -
+            rect.left -
+            rect.width / 2
+          ) * 0.06;
 
 
-      button.style.transform =
-        `translate(${x}px, ${y}px)`;
+        const y =
+          (
+            event.clientY -
+            rect.top -
+            rect.height / 2
+          ) * 0.06;
 
-    }
-  );
+
+        button.style.transform =
+          `translate(${x}px, ${y}px)`;
+
+      }
+    );
 
 
-  button.addEventListener(
-    "mouseleave",
-    () => {
+    button.addEventListener(
+      "mouseleave",
+      () => {
 
-      button.style.transform =
-        "";
+        button.style.transform =
+          "";
 
-    }
-  );
+      }
+    );
 
-});
+  });
 
 }
 
 
 /* =========================================================
- DEBUG MESSAGE
-========================================================= */
+   INITIALIZE
+   ========================================================= */
 
 console.log(
-"Webcraft website initialized successfully."
+  "Webcraft initialized."
 );
