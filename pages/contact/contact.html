@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Start a website project with Webcraft."
+  >
+
+  <title>Contact — Webcraft</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Global styles -->
+  <link
+    rel="stylesheet"
+    href="../../css/styles.css"
+  >
+
+  <!-- Contact page styles -->
+  <link
+    rel="stylesheet"
+    href="../../css/contact.css"
+  >
+</head>
+
+<body>
+
+  <!-- =====================================================
+       NAVIGATION
+  ====================================================== -->
+
+  <header class="nav-wrap">
+
+    <nav class="nav container" aria-label="Main navigation">
+
+      <a
+        href="../../index.html"
+        class="brand"
+        aria-label="Webcraft home"
+      >
+        <img
+          src="../../assets/logo/logo.png"
+          alt=""
+        >
+
+        <span>
+          Web<span>craft</span>
+        </span>
+      </a>
+
+      <div class="nav-links" id="navLinks">
+
+        <a href="../../index.html">
+          Home
+        </a>
+
+        <a href="../work/work.html">
+        Our Work
+        </a>
+
+        <a href="../services/services.html">
+          Services
+        </a>
+
+        <a href="../process/process.html">
+          Process
+        </a>
+
+        <a href="../about/about.html">
+          About Us
+        </a>
+        <a href="../contact/contact.html">
+          Contact Us
+        </a>
+
+        <a
+          href="contact.html"
+          class="nav-cta"
+          aria-current="page"
+        >
+          Start a project <b>↗</b>
+        </a>
+
+      </div>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-label="Open navigation"
+        aria-expanded="false"
+        aria-controls="navLinks"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+    </nav>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
+
+  <main>
+
+    <!-- CONTACT HERO -->
+
+    <section class="contact-page">
+
+      <div class="container">
+
+        <div class="contact-page-intro">
+
+          <span class="section-kicker">
+            Start a project
+          </span>
+
+          <h1>
+            Let's build something
+            <em>worth visiting.</em>
+          </h1>
+
+          <p>
+            Tell us a little about your business, your goals,
+            and what you need from your website. We'll take it
+            from there.
+          </p>
+
+        </div>
+
+
+        <!-- CONTACT CONTENT -->
+
+        <div class="contact-page-grid">
+
+          <!-- INFO -->
+
+          <aside class="contact-page-info">
+
+            <div class="contact-info-block">
+
+              <span>
+                Email
+              </span>
+
+              <a href="mailto:hello@webcraft.com">
+                hello@webcraft.com
+              </a>
+
+            </div>
+
+
+            <div class="contact-info-block">
+
+              <span>
+                Typical projects
+              </span>
+
+              <p>
+                Business websites<br>
+                Landing pages<br>
+                Portfolio websites<br>
+                E-commerce concepts
+              </p>
+
+            </div>
+
+
+            <div class="contact-info-block">
+
+              <span>
+                Response
+              </span>
+
+              <p>
+                Usually within 1–2 business days.
+              </p>
+
+            </div>
+
+          </aside>
+
+
+          <!-- FORM -->
+
+          <div class="contact-page-form">
+
+            <form id="contactForm" novalidate>
+
+              <div class="contact-form-row">
+
+                <label>
+                  Name
+
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Your name"
+                    autocomplete="name"
+                    required
+                  >
+                </label>
+
+
+                <label>
+                  Email
+
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required
+                  >
+                </label>
+
+              </div>
+
+
+              <label>
+                Business / company
+
+                <input
+                  type="text"
+                  name="company"
+                  placeholder="Your business name"
+                  autocomplete="organization"
+                >
+              </label>
+
+
+              <label>
+                What do you need?
+
+                <select
+                  name="project"
+                  required
+                >
+                  <option value="" selected disabled>
+                    Select a project type
+                  </option>
+
+                  <option value="business">
+                    Business website
+                  </option>
+
+                  <option value="landing">
+                    Landing page
+                  </option>
+
+                  <option value="portfolio">
+                    Portfolio website
+                  </option>
+
+                  <option value="ecommerce">
+                    E-commerce website
+                  </option>
+
+                  <option value="other">
+                    Something else
+                  </option>
+                </select>
+              </label>
+
+
+              <label>
+                Tell us about the project
+
+                <textarea
+                  name="message"
+                  placeholder="What are you building, and what should the website achieve?"
+                  required
+                ></textarea>
+              </label>
+
+
+              <div class="contact-form-footer">
+
+                <p>
+                  No pressure. Just tell us what you're working on.
+                </p>
+
+                <button
+                  type="submit"
+                  class="btn btn-dark"
+                >
+                  Send enquiry <span>↗</span>
+                </button>
+
+              </div>
+
+
+              <p
+                class="contact-form-message"
+                id="contactMessage"
+                aria-live="polite"
+              ></p>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SIMPLE CTA -->
+
+    <section class="contact-bottom">
+
+      <div class="container">
+
+        <div class="contact-bottom-inner">
+
+          <span class="section-kicker">
+            Not ready yet?
+          </span>
+
+          <h2>
+            Explore the
+            <em>work first.</em>
+          </h2>
+
+          <a
+            href="../work/work.html"
+            class="text-link"
+          >
+            View selected work <span>↗</span>
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer class="footer">
+
+    <div class="container">
+
+      <div class="footer-main">
+
+        <div>
+
+          <a
+            href="../../index.html"
+            class="brand"
+          >
+
+            <img
+              src="../../assets/logo/logo.png"
+              alt=""
+            >
+
+            <span>
+              Web<span>craft</span>
+            </span>
+
+          </a>
+
+          <p>
+            Websites that work.
+          </p>
+
+        </div>
+
+
+        <div class="footer-links">
+
+          <div>
+
+            <span>
+              Explore
+            </span>
+
+            <a href="../../index.html">
+              Home
+            </a>
+
+            <a href="../work/work.html">
+              Work
+            </a>
+
+            <a href="../services/services.html">
+              Services
+            </a>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Company
+            </span>
+
+            <a href="../process/process.html">
+              Process
+            </a>
+
+            <a href="../about/about.html">
+              About
+            </a>
+
+            <a href="contact.html">
+              Contact
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="footer-bottom">
+
+        <span>
+          © <span id="year"></span> Webcraft
+        </span>
+
+        <span>
+          Built with intention.
+        </span>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <!-- JavaScript -->
+
+  <script src="../../js/main.js"></script>
+
+</body>
+
+</html>

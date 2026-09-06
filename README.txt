@@ -1,8 +1,6 @@
 WEBCRAFT v2
 ===========
-A calmer, more functional Webcraft agency site.
-
-Changes:
+A calmer,
 - Replaced the blue-heavy visual system with warm off-white, charcoal and restrained teal.
 - Rebuilt the hero around a usable project-planning interaction.
 - Reworked portfolio cards into editorial case-study cards with filters and modal details.
@@ -15,3 +13,6 @@ Open index.html in a browser.
 
 Production:
 Connect the contact form to your real email/API endpoint. Replace sample portfolio content and add your real domain/social links.
+ more functional Webcraft agency site.
+
+Changes:
