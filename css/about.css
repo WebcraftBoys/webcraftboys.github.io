@@ -1042,3 +1042,7 @@
     font-size: 38px;
   }
 }
+
+/* Second-pass refinements */
+
+.about-page img { height:auto; }

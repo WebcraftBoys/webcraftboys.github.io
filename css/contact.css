@@ -762,3 +762,14 @@
     font-size: 35px;
   }
 }
+
+
+/* Second-pass refinements */
+
+.contact-form-message { min-height: 24px; }
+.contact-form-message.success { border-color: rgba(22,135,137,.28); background: var(--accent-soft); }
+.contact-form-message.error { border-color: rgba(180,72,72,.28); }
+.contact-form-section label:focus-within > span { color: var(--accent); }
+.contact-form-footer { align-items: end; }
+.contact-form-privacy { opacity:.72; }
+.form-honeypot { position:absolute !important; left:-10000px !important; width:1px !important; height:1px !important; overflow:hidden !important; }

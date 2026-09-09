@@ -1,519 +1,146 @@
 "use strict";
 
-/**
- * =========================================================
- * WEBCRAFT — MAIN.JS
- * =========================================================
- *
- * Global functionality used across the entire website:
- *
- * - Page loader
- * - Mobile navigation
- * - Scroll reveal animations
- * - Website sharing
- * - Current year
- * - Magnetic buttons
- *
- * Page-specific functionality belongs in:
- * js/page.js
- *
- * Do NOT put contact-form, portfolio, planner, or
- * case-study logic in this file.
- */
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const $ = (selector, parent = document) =>
-  parent.querySelector(selector);
-
-const $$ = (selector, parent = document) =>
-  Array.from(parent.querySelectorAll(selector));
-
-
-/* =========================================================
-   PAGE LOADER
-========================================================= */
+const $ = (selector, parent = document) => parent.querySelector(selector);
+const $$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
 
 function initLoader() {
   const loader = $("#loader");
-
   if (!loader) return;
-
   let hidden = false;
-
-  const hideLoader = () => {
-    if (hidden) return;
-
-    hidden = true;
-    loader.classList.add("hidden");
-  };
-
-  /*
-   * Normal page-load behavior.
-   */
-  window.addEventListener(
-    "load",
-    () => {
-      setTimeout(hideLoader, 400);
-    },
-    { once: true }
-  );
-
-  /*
-   * Safety fallback in case the load event
-   * takes too long or another resource fails.
-   */
-  setTimeout(hideLoader, 2500);
+  const hide = () => { if (hidden) return; hidden = true; loader.classList.add("hidden"); };
+  window.addEventListener("load", () => setTimeout(hide, 250), { once: true });
+  setTimeout(hide, 2200);
 }
-
-
-/* =========================================================
-   MOBILE NAVIGATION
-========================================================= */
 
 function initMobileNavigation() {
-  const menuToggle = $(".menu-toggle");
-  const navLinks = $("#navLinks");
-
-  if (!menuToggle || !navLinks) return;
-
-  const navItems =
-    $$(".nav-links a", navLinks);
-
-
-  function closeMenu() {
-    navLinks.classList.remove("open");
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Open navigation"
-    );
-  }
-
-
-  function openMenu() {
-    navLinks.classList.add("open");
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Close navigation"
-    );
-  }
-
-
-  function toggleMenu() {
-    const isOpen =
-      navLinks.classList.contains("open");
-
-    if (isOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  }
-
-
-  /*
-   * Toggle mobile menu.
-   */
-  menuToggle.addEventListener(
-    "click",
-    toggleMenu
-  );
-
-
-  /*
-   * Close menu after selecting a link.
-   */
-  navItems.forEach(link => {
-    link.addEventListener(
-      "click",
-      closeMenu
-    );
+  const toggle = $(".menu-toggle");
+  const nav = $("#navLinks");
+  if (!toggle || !nav) return;
+  const close = () => {
+    nav.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open navigation");
+  };
+  const open = () => {
+    nav.classList.add("open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Close navigation");
+  };
+  toggle.addEventListener("click", () => nav.classList.contains("open") ? close() : open());
+  $$("a", nav).forEach(link => link.addEventListener("click", close));
+  document.addEventListener("click", e => {
+    if (nav.classList.contains("open") && !nav.contains(e.target) && !toggle.contains(e.target)) close();
   });
-
-
-  /*
-   * Close when clicking outside.
-   */
-  document.addEventListener(
-    "click",
-    event => {
-      if (!navLinks.classList.contains("open")) {
-        return;
-      }
-
-      const clickedInsideMenu =
-        navLinks.contains(event.target);
-
-      const clickedToggle =
-        menuToggle.contains(event.target);
-
-      if (
-        !clickedInsideMenu &&
-        !clickedToggle
-      ) {
-        closeMenu();
-      }
-    }
-  );
-
-
-  /*
-   * Close with Escape.
-   */
-  document.addEventListener(
-    "keydown",
-    event => {
-      if (
-        event.key !== "Escape" ||
-        !navLinks.classList.contains("open")
-      ) {
-        return;
-      }
-
-      closeMenu();
-      menuToggle.focus();
-    }
-  );
-
-
-  /*
-   * Close mobile menu when returning
-   * to desktop width.
-   */
-  window.addEventListener(
-    "resize",
-    () => {
-      if (
-        window.innerWidth > 768 &&
-        navLinks.classList.contains("open")
-      ) {
-        closeMenu();
-      }
-    }
-  );
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && nav.classList.contains("open")) { close(); toggle.focus(); }
+  });
+  window.addEventListener("resize", () => { if (window.innerWidth > 768) close(); }, { passive:true });
 }
 
-
-/* =========================================================
-   SCROLL REVEAL
-========================================================= */
+function initCurrentNavigation() {
+  const current = new URL(window.location.href);
+  $$(".nav-links a:not(.nav-cta)").forEach(link => {
+    const url = new URL(link.href, window.location.href);
+    const same = url.pathname.replace(/\/$/, "") === current.pathname.replace(/\/$/, "");
+    if (same) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
+}
 
 function initScrollReveal() {
-  const elements =
-    $$(".reveal");
-
+  const elements = $$(".reveal");
   if (!elements.length) return;
-
-
-  /*
-   * Fallback for browsers without
-   * IntersectionObserver.
-   */
-  if (
-    !("IntersectionObserver" in window)
-  ) {
-    elements.forEach(element => {
-      element.classList.add("visible");
-    });
-
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+    elements.forEach(el => el.classList.add("visible"));
     return;
   }
-
-
-  const observer =
-    new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          entry.target.classList.add(
-            "visible"
-          );
-
-          observer.unobserve(
-            entry.target
-          );
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin:
-          "0px 0px -40px 0px"
-      }
-    );
-
-
-  elements.forEach(element => {
-    observer.observe(element);
-  });
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); }
+  }), { threshold:.12, rootMargin:"0px 0px -40px 0px" });
+  elements.forEach(el => observer.observe(el));
 }
-
-
-/* =========================================================
-   TOAST
-========================================================= */
 
 let toastTimer = null;
-
-
 function showToast(message) {
   const toast = $("#toast");
-
   if (!toast) return;
-
-  toast.textContent =
-    String(message || "");
-
+  toast.textContent = String(message || "");
   toast.classList.add("show");
-
   clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
 }
 
-
-/* =========================================================
-   SHARE WEBSITE
-========================================================= */
+function initScrollTools() {
+  const progress = document.createElement("div");
+  progress.className = "site-progress";
+  progress.setAttribute("aria-hidden", "true");
+  progress.innerHTML = "<span></span>";
+  document.body.appendChild(progress);
+  const bar = $("span", progress);
+  const top = document.createElement("button");
+  top.className = "back-to-top";
+  top.type = "button";
+  top.setAttribute("aria-label", "Back to top");
+  top.innerHTML = "↑";
+  document.body.appendChild(top);
+  const update = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio = max > 0 ? window.scrollY / max : 0;
+    bar.style.width = `${Math.min(100, Math.max(0, ratio * 100))}%`;
+    top.classList.toggle("visible", window.scrollY > 600);
+  };
+  window.addEventListener("scroll", update, { passive:true });
+  top.addEventListener("click", () => window.scrollTo({ top:0, behavior:"smooth" }));
+  update();
+}
 
 function initShareButton() {
-  const button =
-    $("#shareButton");
-
+  const button = $("#shareButton");
   if (!button) return;
-
-
-  button.addEventListener(
-    "click",
-    async () => {
-      const url =
-        window.location.href;
-
-
-      /*
-       * Native share API.
-       */
-      if (
-        typeof navigator.share ===
-        "function"
-      ) {
-        try {
-          await navigator.share({
-            title: "Webcraft",
-            text:
-              "Webcraft — websites that work.",
-            url
-          });
-
-        } catch (error) {
-
-          /*
-           * Ignore intentional cancellation.
-           */
-          if (
-            error?.name !==
-            "AbortError"
-          ) {
-            console.error(
-              "Share error:",
-              error
-            );
-          }
-        }
-
-        return;
-      }
-
-
-      /*
-       * Clipboard fallback.
-       */
-      try {
-
-        if (
-          navigator.clipboard &&
-          typeof navigator.clipboard
-            .writeText ===
-            "function"
-        ) {
-          await navigator.clipboard.writeText(
-            url
-          );
-
-          showToast(
-            "Webcraft link copied."
-          );
-
-          return;
-        }
-
-        throw new Error(
-          "Clipboard API unavailable."
-        );
-
-      } catch (error) {
-
-        console.error(
-          "Clipboard error:",
-          error
-        );
-
-        showToast(
-          "Unable to copy the link."
-        );
-      }
+  button.addEventListener("click", async () => {
+    const url = window.location.href;
+    if (typeof navigator.share === "function") {
+      try { await navigator.share({ title: document.title, text:"Webcraft — websites that work.", url }); }
+      catch (e) { if (e?.name !== "AbortError") console.error("Share error:", e); }
+      return;
     }
-  );
-}
-
-
-/* =========================================================
-   CURRENT YEAR
-========================================================= */
-
-function initCurrentYear() {
-  const year =
-    $("#year");
-
-  if (!year) return;
-
-  year.textContent =
-    String(
-      new Date().getFullYear()
-    );
-}
-
-
-/* =========================================================
-   MAGNETIC BUTTONS
-========================================================= */
-
-function initMagneticButtons() {
-
-  /*
-   * Only enable the effect on devices
-   * with a precise pointer such as a mouse.
-   */
-  if (
-    !window.matchMedia ||
-    !window.matchMedia(
-      "(pointer: fine)"
-    ).matches
-  ) {
-    return;
-  }
-
-
-  const buttons =
-    $$(".magnetic");
-
-  if (!buttons.length) return;
-
-
-  buttons.forEach(button => {
-
-    button.addEventListener(
-      "mousemove",
-      event => {
-
-        const rect =
-          button.getBoundingClientRect();
-
-
-        const offsetX =
-          (
-            event.clientX -
-            rect.left -
-            rect.width / 2
-          ) * 0.06;
-
-
-        const offsetY =
-          (
-            event.clientY -
-            rect.top -
-            rect.height / 2
-          ) * 0.06;
-
-
-        button.style.transform =
-          `translate(${offsetX}px, ${offsetY}px)`;
-      }
-    );
-
-
-    button.addEventListener(
-      "mouseleave",
-      () => {
-        button.style.transform = "";
-      }
-    );
-
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast("Page link copied.");
+    } catch (e) {
+      console.error("Clipboard error:", e);
+      showToast("Unable to copy the link.");
+    }
   });
 }
 
+function initCurrentYear() {
+  $$("#year").forEach(el => el.textContent = String(new Date().getFullYear()));
+}
 
-/* =========================================================
-   INITIALIZE WEBCRAFT
-========================================================= */
+function initMagneticButtons() {
+  if (!window.matchMedia?.("(pointer: fine)").matches || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  $$(".magnetic").forEach(button => {
+    button.addEventListener("mousemove", e => {
+      const r = button.getBoundingClientRect();
+      const x = (e.clientX-r.left-r.width/2)*.045;
+      const y = (e.clientY-r.top-r.height/2)*.045;
+      button.style.transform = `translate(${x}px, ${y}px)`;
+    });
+    button.addEventListener("mouseleave", () => button.style.transform = "");
+  });
+}
 
 function initWebcraft() {
-
-  /*
-   * Global features only.
-   */
   initLoader();
   initMobileNavigation();
+  initCurrentNavigation();
   initScrollReveal();
+  initScrollTools();
   initShareButton();
   initCurrentYear();
   initMagneticButtons();
-
-
-  console.log(
-    "Webcraft main.js initialized."
-  );
 }
 
-
-/* =========================================================
-   START APPLICATION
-========================================================= */
-
-if (
-  document.readyState ===
-  "loading"
-) {
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    initWebcraft,
-    {
-      once: true
-    }
-  );
-
-} else {
-
-  initWebcraft();
-
-}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initWebcraft, { once:true });
+else initWebcraft();

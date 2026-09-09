@@ -1,18 +1,31 @@
-WEBCRAFT v2
-===========
-A calmer,
-- Replaced the blue-heavy visual system with warm off-white, charcoal and restrained teal.
-- Rebuilt the hero around a usable project-planning interaction.
-- Reworked portfolio cards into editorial case-study cards with filters and modal details.
-- Added functional project brief form with validation and mailto handoff.
-- Added process accordions, native Web Share support, copy fallback, responsive navigation and subtler interactions.
-- Supplied Webcraft logo is retained in assets/webcraft-logo.png.
+WEBCRAFT — WEBSITE / PROFESSIONAL PASS 2
+=========================================
 
-Run:
-Open index.html in a browser.
+A production-minded static marketing website for Webcraft.
 
-Production:
-Connect the contact form to your real email/API endpoint. Replace sample portfolio content and add your real domain/social links.
- more functional Webcraft agency site.
+Included:
+- Homepage positioning, service discovery and project planner
+- Services, Work, Process, About, Contact and FAQ pages
+- Responsive navigation with active-page state
+- Project filters with live result count and empty state
+- Accessible case-study modal with focus handling
+- Contact enquiry form with validation, anti-bot honeypot and Google Apps Script submission
+- Scroll progress and back-to-top controls
+- Reduced-motion support and keyboard accessibility
+- SEO metadata, canonical URLs, structured data, robots.txt and sitemap.xml
+- Custom 404 page
+- Optimized WebP logo + favicon
+- Internal dashboard marked noindex/nofollow (authentication is still required for real security)
 
-Changes:
+IMPORTANT PRODUCTION CHECKS:
+1. Confirm the deployed domain if it differs from https://webcraftboys.github.io/ and update canonical URLs, sitemap and structured data.
+2. Protect /pages/dashboard/ with real authentication/authorization before using it for private client/team data.
+3. Verify the Google Apps Script endpoint, permissions and spam controls.
+4. Add final social profiles/OG artwork when those assets are ready.
+5. Run Lighthouse/PageSpeed after deployment and test the form on the production domain.
+
+CONTACT FORM CONNECTION
+-----------------------
+The contact form is prepared for Google Apps Script. See apps-script/SETUP.md.
+Set the deployed Apps Script `/exec` URL in js/contact-config.js before publishing.
+The endpoint sends enquiries to webcraft.devwork@gmail.com and logs leads to a Google Sheet.

@@ -1771,3 +1771,9 @@ transition: none;
 }
 
 }
+
+
+/* Second-pass refinements */
+
+.page-cta { position: relative; overflow: hidden; }
+.page-cta::after { content:""; position:absolute; width:220px; height:220px; border:1px solid currentColor; border-radius:50%; right:-110px; top:50%; opacity:.08; pointer-events:none; }

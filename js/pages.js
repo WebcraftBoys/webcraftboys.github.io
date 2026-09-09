@@ -1,921 +1,130 @@
 "use strict";
 
-/**
- * =========================================================
- * WEBCRAFT — PAGE.JS
- * =========================================================
- *
- * Page-specific functionality:
- *
- * - Contact form
- * - Google Apps Script submission
- * - Portfolio filters
- * - Project planner
- * - Case study modal
- *
- * Global functionality belongs in:
- * js/main.js
- */
+const page$ = (selector, parent = document) => parent.querySelector(selector);
+const page$$ = (selector, parent = document) => Array.from(parent.querySelectorAll(selector));
+const getFieldValue = (fd, name) => String(fd.get(name) || "").trim();
 
-
-/* =========================================================
-   GOOGLE APPS SCRIPT
-========================================================= */
-
-const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxzBsIdFDmSS5gu2lh3thPUs-Fc9i3o4M0CHKxcjVG3D4rdWzAKedsTBKOv5Sm8uORcRA/exec";
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const page$ = (selector, parent = document) =>
-  parent.querySelector(selector);
-
-const page$$ = (selector, parent = document) =>
-  Array.from(parent.querySelectorAll(selector));
-
-
-function getFieldValue(formData, fieldName) {
-  return String(
-    formData.get(fieldName) || ""
-  ).trim();
+function setContactMessage(message = "", type = "") {
+  const el = page$("#contactMessage");
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove("success", "error");
+  if (type) el.classList.add(type);
 }
-
-
-/* =========================================================
-   CONTACT FORM MESSAGE
-========================================================= */
-
-function setContactMessage(
-  message = "",
-  type = ""
-) {
-  const messageElement =
-    page$("#contactMessage");
-
-  if (!messageElement) return;
-
-  messageElement.textContent =
-    message;
-
-  messageElement.classList.remove(
-    "success",
-    "error"
-  );
-
-  if (
-    type === "success" ||
-    type === "error"
-  ) {
-    messageElement.classList.add(type);
-  }
-}
-
-
-/* =========================================================
-   CONTACT FORM
-========================================================= */
 
 function initContactForm() {
-  const form =
-    page$("#contactForm");
-
-  if (!form) return;
-
-
-  /*
-   * Prevent this function from being
-   * initialized more than once.
-   */
-  if (
-    form.dataset.contactInitialized ===
-    "true"
-  ) {
-    return;
-  }
-
-  form.dataset.contactInitialized =
-    "true";
-
-
-  const submitButton =
-    form.querySelector(
-      'button[type="submit"]'
-    );
-
-  if (!submitButton) return;
-
-
-  form.addEventListener(
-    "submit",
-    async event => {
-
-      event.preventDefault();
-
-
-      /*
-       * Clear previous status.
-       */
-      setContactMessage();
-
-
-      /*
-       * Native browser validation.
-       */
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-
-      const formData =
-        new FormData(form);
-
-
-      /*
-       * Current contact fields.
-       *
-       * Keep these names synchronized
-       * with contact.html.
-       */
-      const name =
-        getFieldValue(
-          formData,
-          "name"
-        );
-
-      const email =
-        getFieldValue(
-          formData,
-          "email"
-        );
-
-      const phone =
-        getFieldValue(
-          formData,
-          "phone"
-        );
-
-      const project =
-        getFieldValue(
-          formData,
-          "project"
-        );
-
-      const timeline =
-        getFieldValue(
-          formData,
-          "timeline"
-        );
-
-      const message =
-        getFieldValue(
-          formData,
-          "message"
-        );
-
-
-      /*
-       * Required-field validation.
-       */
-      if (
-        !name ||
-        !email ||
-        !phone ||
-        !project ||
-        !timeline ||
-        !message
-      ) {
-        setContactMessage(
-          "Please complete all required fields.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      /*
-       * Extra email validation.
-       */
-      const emailPattern =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailPattern.test(email)) {
-        setContactMessage(
-          "Please enter a valid email address.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      /*
-       * Save original button contents.
-       */
-      const originalHTML =
-        submitButton.innerHTML;
-
-
-      /*
-       * Prevent double submissions.
-       */
-      submitButton.disabled =
-        true;
-
-      submitButton.setAttribute(
-        "aria-busy",
-        "true"
-      );
-
-      submitButton.innerHTML =
-        'Sending enquiry <span aria-hidden="true">…</span>';
-
-
-      try {
-
-        /*
-         * Build URL-encoded request.
-         *
-         * This format works reliably with
-         * Google Apps Script web apps.
-         */
-        const request =
-          new URLSearchParams();
-
-
-        request.set(
-          "name",
-          name
-        );
-
-        request.set(
-          "email",
-          email
-        );
-
-        request.set(
-          "phone",
-          phone
-        );
-
-        request.set(
-          "project",
-          project
-        );
-
-        request.set(
-          "timeline",
-          timeline
-        );
-
-        request.set(
-          "message",
-          message
-        );
-
-
-        /*
-         * Submit to Google Apps Script.
-         *
-         * no-cors is intentional because the
-         * frontend cannot reliably read the
-         * response from another origin.
-         */
-        await fetch(
-          GOOGLE_SCRIPT_URL,
-          {
-            method: "POST",
-
-            mode: "no-cors",
-
-            headers: {
-              "Content-Type":
-                "application/x-www-form-urlencoded;charset=UTF-8"
-            },
-
-            body:
-              request.toString()
-          }
-        );
-
-
-        /*
-         * The request completed.
-         *
-         * Because no-cors prevents us from
-         * inspecting the response, we cannot
-         * verify the Apps Script response body.
-         */
-        form.reset();
-
-
-        /*
-         * Show visible success state.
-         */
-        setContactMessage(
-          "Thanks! Your enquiry has been sent. We'll get back to you within 1–2 business days.",
-          "success"
-        );
-
-
-        /*
-         * Use the global toast when available.
-         */
-        if (
-          typeof showToast ===
-          "function"
-        ) {
-          showToast(
-            "Enquiry sent successfully."
-          );
-        }
-
-
-      } catch (error) {
-
-        console.error(
-          "Webcraft contact form error:",
-          error
-        );
-
-
-        setContactMessage(
-          "We couldn't send your enquiry right now. Please try again.",
-          "error"
-        );
-
-
-        if (
-          typeof showToast ===
-          "function"
-        ) {
-          showToast(
-            "Unable to send enquiry."
-          );
-        }
-
-      } finally {
-
-        /*
-         * Restore button.
-         */
-        submitButton.disabled =
-          false;
-
-        submitButton.removeAttribute(
-          "aria-busy"
-        );
-
-        submitButton.innerHTML =
-          originalHTML;
-      }
+  const form = page$("#contactForm");
+  if (!form || form.dataset.contactInitialized === "true") return;
+  form.dataset.contactInitialized = "true";
+  const submit = form.querySelector('button[type="submit"]');
+  if (!submit) return;
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    setContactMessage();
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    const fd = new FormData(form);
+    if (getFieldValue(fd, "website_check")) return;
+    const name=getFieldValue(fd,"name"), email=getFieldValue(fd,"email"), phone=getFieldValue(fd,"phone");
+    const project=getFieldValue(fd,"project"), timeline=getFieldValue(fd,"timeline"), website=getFieldValue(fd,"website");
+    const source=getFieldValue(fd,"source"), message=getFieldValue(fd,"message");
+
+    if ([name,email,phone,project,timeline,message].some(v => !v)) {
+      setContactMessage("Please complete all required fields.", "error"); return;
     }
-  );
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setContactMessage("Please enter a valid email address.", "error"); return;
+    }
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+      setContactMessage("Please enter a valid phone number.", "error"); return;
+    }
+    if (message.length < 20) {
+      setContactMessage("Please give us a little more detail about the project (at least 20 characters).", "error"); return;
+    }
+
+    const original = submit.innerHTML;
+    submit.disabled = true;
+    submit.setAttribute("aria-busy","true");
+    submit.innerHTML = 'Sending enquiry <span aria-hidden="true">…</span>';
+
+    try {
+      const endpoint = String(window.WEBCRAFT_CONTACT_ENDPOINT || "").trim();
+      if (!endpoint || endpoint.includes("PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE")) {
+        throw new Error("Contact endpoint is not configured.");
+      }
+      const request = new URLSearchParams({ name,email,phone,project,timeline,website,source,message,website_check:"" });
+      await fetch(endpoint, {
+        method:"POST", mode:"no-cors",
+        headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
+        body:request.toString(), keepalive:true
+      });
+      form.reset();
+      setContactMessage("Thanks! Your enquiry has been sent. We'll get back to you within 1–2 business days.", "success");
+      if (typeof showToast === "function") showToast("Enquiry sent successfully.");
+    } catch (error) {
+      console.error("Webcraft contact form error:", error);
+      setContactMessage("We couldn't send your enquiry right now. Please try again or email us directly.", "error");
+      if (typeof showToast === "function") showToast("Unable to send enquiry.");
+    } finally {
+      submit.disabled=false; submit.removeAttribute("aria-busy"); submit.innerHTML=original;
+    }
+  });
 }
-
-
-/* =========================================================
-   PORTFOLIO FILTERS
-========================================================= */
 
 function initPortfolioFilters() {
-  const buttons =
-    page$$(".filter");
-
-  const cards =
-    page$$(
-      ".case-card, .work-project-card"
-    );
-
-  if (
-    !buttons.length ||
-    !cards.length
-  ) {
-    return;
-  }
-
-
-  /*
-   * Prevent duplicate listeners.
-   */
-  buttons.forEach(button => {
-
-    if (
-      button.dataset.filterInitialized ===
-      "true"
-    ) {
-      return;
-    }
-
-    button.dataset.filterInitialized =
-      "true";
-
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        const selectedFilter =
-          button.dataset.filter ||
-          "all";
-
-
-        /*
-         * Update active button.
-         */
-        buttons.forEach(item => {
-
-          const active =
-            item === button;
-
-          item.classList.toggle(
-            "active",
-            active
-          );
-
-          item.setAttribute(
-            "aria-pressed",
-            String(active)
-          );
-        });
-
-
-        /*
-         * Filter cards.
-         */
-        cards.forEach(card => {
-
-          const category =
-            card.dataset.category ||
-            "";
-
-          const hidden =
-            selectedFilter !== "all" &&
-            category !== selectedFilter;
-
-
-          card.classList.toggle(
-            "hidden",
-            hidden
-          );
-
-          card.setAttribute(
-            "aria-hidden",
-            String(hidden)
-          );
-        });
-      }
-    );
-  });
-
-
-  /*
-   * Initialize active filter.
-   */
-  const activeButton =
-    page$(".filter.active") ||
-    buttons[0];
-
-
-  if (activeButton) {
-    activeButton.click();
-  }
+  const buttons=page$$(".filter"), cards=page$$(".case-card, .work-project-card");
+  if (!buttons.length || !cards.length) return;
+  const empty=page$("#workEmpty");
+  const count=page$("#workCount");
+  const apply=selected => {
+    buttons.forEach(b => { const active=(b.dataset.filter||"all")===selected; b.classList.toggle("active",active); b.setAttribute("aria-pressed",String(active)); });
+    let visible=0;
+    cards.forEach(card => { const show=selected==="all" || (card.dataset.category||"")===selected; card.classList.toggle("hidden",!show); card.setAttribute("aria-hidden",String(!show)); if(show) visible++; });
+    if(empty) empty.classList.toggle("visible",visible===0);
+    if(count) count.textContent=String(visible);
+  };
+  buttons.forEach(button => { button.addEventListener("click",()=>apply(button.dataset.filter||"all")); });
+  apply(page$(".filter.active")?.dataset.filter || "all");
 }
-
-
-/* =========================================================
-   PROJECT PLANNER
-========================================================= */
-
-const DEFAULT_GOAL =
-  "New business website";
-
 
 function initProjectPlanner() {
-  const goals =
-    page$$(".goal");
-
-  if (!goals.length) return;
-
-
-  const goalOutput =
-    page$("#goalOutput");
-
-  const goalSelect =
-    page$("#goalSelect");
-
-  const plannerNext =
-    page$("#plannerNext");
-
-
-  function selectGoal(button) {
-    if (!button) return;
-
-
-    const goal =
-      String(
-        button.dataset.goal || ""
-      ).trim();
-
-
-    if (!goal) return;
-
-
-    /*
-     * Update selected goal.
-     */
-    goals.forEach(item => {
-
-      const active =
-        item === button;
-
-      item.classList.toggle(
-        "active",
-        active
-      );
-
-      item.setAttribute(
-        "aria-pressed",
-        String(active)
-      );
-    });
-
-
-    /*
-     * Update visible planner text.
-     */
-    if (goalOutput) {
-      goalOutput.textContent =
-        goal;
-    }
-
-
-    /*
-     * Synchronize with any older
-     * planner select if present.
-     */
-    if (goalSelect) {
-
-      goalSelect.value =
-        goal;
-
-      goalSelect.dispatchEvent(
-        new Event("change", {
-          bubbles: true
-        })
-      );
-    }
-  }
-
-
-  function resetPlanner() {
-
-    const defaultGoal =
-      goals.find(
-        goal =>
-          goal.dataset.goal ===
-          DEFAULT_GOAL
-      );
-
-
-    if (defaultGoal) {
-      selectGoal(defaultGoal);
-      return;
-    }
-
-
-    goals.forEach(goal => {
-
-      goal.classList.remove(
-        "active"
-      );
-
-      goal.setAttribute(
-        "aria-pressed",
-        "false"
-      );
-    });
-
-
-    if (goalOutput) {
-      goalOutput.textContent =
-        DEFAULT_GOAL;
-    }
-
-
-    if (goalSelect) {
-      goalSelect.value = "";
-    }
-  }
-
-
-  /*
-   * Expose reset function for any
-   * other page feature that needs it.
-   */
-  window.resetPlanner =
-    resetPlanner;
-
-
-  /*
-   * Goal buttons.
-   */
-  goals.forEach(goal => {
-
-    if (
-      goal.dataset.plannerInitialized ===
-      "true"
-    ) {
-      return;
-    }
-
-    goal.dataset.plannerInitialized =
-      "true";
-
-
-    goal.addEventListener(
-      "click",
-      () => {
-        selectGoal(goal);
-      }
-    );
-  });
-
-
-  /*
-   * Continue button.
-   */
-  plannerNext?.addEventListener(
-    "click",
-    () => {
-
-      const activeGoal =
-        page$(".goal.active");
-
-      if (activeGoal) {
-        selectGoal(activeGoal);
-      }
-    }
-  );
-
-
-  /*
-   * Initialize planner state.
-   */
-  const initialGoal =
-    page$(".goal.active") ||
-    goals.find(
-      goal =>
-        goal.dataset.goal ===
-        DEFAULT_GOAL
-    ) ||
-    goals[0];
-
-
-  if (initialGoal) {
-    selectGoal(initialGoal);
-  }
+  const goals=page$$('.goal');
+  if(!goals.length) return;
+  const output=page$("#goalOutput"), select=page$("#goalSelect"), next=page$("#plannerNext");
+  const choose=button => {
+    const goal=String(button.dataset.goal||"").trim(); if(!goal) return;
+    goals.forEach(item=>{const active=item===button; item.classList.toggle("active",active); item.setAttribute("aria-pressed",String(active));});
+    if(output) output.textContent=goal;
+    if(select) { select.value=goal; select.dispatchEvent(new Event("change",{bubbles:true})); }
+  };
+  goals.forEach(goal=>{ if(goal.tagName!=="BUTTON" && goal.getAttribute("role")!=="button") { goal.setAttribute("role","button"); goal.setAttribute("tabindex","0"); } goal.setAttribute("aria-pressed",goal.classList.contains("active")?"true":"false"); goal.addEventListener("click",()=>choose(goal)); goal.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choose(goal);}}); });
+  next?.addEventListener("click",()=>{ const active=page$(".goal.active"); if(active) choose(active); });
+  const initial=page$(".goal.active")||goals[0]; if(initial) choose(initial);
 }
-
-
-/* =========================================================
-   CASE STUDY MODAL
-========================================================= */
 
 function initCaseStudyModal() {
-  const modal =
-    page$("#caseModal");
-
-  if (!modal) return;
-
-
-  if (
-    modal.dataset.modalInitialized ===
-    "true"
-  ) {
-    return;
-  }
-
-  modal.dataset.modalInitialized =
-    "true";
-
-
-  const modalTitle =
-    page$("#modalTitle");
-
-  const modalDescription =
-    page$("#modalDescription");
-
-  const modalResult =
-    page$("#modalResult");
-
-  const modalClose =
-    page$(".modal-close");
-
-  const modalBackdrop =
-    page$(".modal-backdrop");
-
-  const modalCTA =
-    page$(".modal-cta");
-
-
-  let lastFocusedElement =
-    null;
-
-
-  function openModal(card) {
-
-    if (!card) return;
-
-
-    lastFocusedElement =
-      document.activeElement;
-
-
-    /*
-     * Populate modal.
-     */
-    if (modalTitle) {
-      modalTitle.textContent =
-        card.dataset.title ||
-        "Project";
+  const modal=page$("#caseModal"); if(!modal || modal.dataset.modalInitialized==="true") return;
+  modal.dataset.modalInitialized="true";
+  const title=page$("#modalTitle"), description=page$("#modalDescription"), result=page$("#modalResult"), close=page$(".modal-close"), backdrop=page$(".modal-backdrop"), cta=page$(".modal-cta");
+  let lastFocus=null;
+  const open=card=>{ if(!card)return; lastFocus=document.activeElement; if(title)title.textContent=card.dataset.title||"Project"; if(description)description.textContent=card.dataset.description||""; if(result)result.textContent=card.dataset.result||""; modal.classList.add("open"); modal.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; close?.focus(); };
+  const shut=()=>{ modal.classList.remove("open"); modal.setAttribute("aria-hidden","true"); document.body.style.overflow=""; lastFocus?.focus?.(); lastFocus=null; };
+  page$$(".case-open").forEach(button=>button.addEventListener("click",()=>open(button.closest(".case-card"))));
+  close?.addEventListener("click",shut); backdrop?.addEventListener("click",shut); cta?.addEventListener("click",shut);
+  document.addEventListener("keydown",e=>{
+    if(!modal.classList.contains("open")) return;
+    if(e.key==="Escape") { shut(); return; }
+    if(e.key==="Tab") {
+      const focusables=page$$('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])',modal);
+      if(!focusables.length)return;
+      const first=focusables[0], last=focusables[focusables.length-1];
+      if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}
     }
-
-
-    if (modalDescription) {
-      modalDescription.textContent =
-        card.dataset.description ||
-        "";
-    }
-
-
-    if (modalResult) {
-      modalResult.textContent =
-        card.dataset.result ||
-        "";
-    }
-
-
-    /*
-     * Open modal.
-     */
-    modal.classList.add(
-      "open"
-    );
-
-    modal.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    document.body.style.overflow =
-      "hidden";
-
-
-    /*
-     * Move focus to close button.
-     */
-    modalClose?.focus();
-  }
-
-
-  function closeModal() {
-
-    modal.classList.remove(
-      "open"
-    );
-
-    modal.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    document.body.style.overflow =
-      "";
-
-
-    /*
-     * Restore focus.
-     */
-    if (
-      lastFocusedElement &&
-      typeof lastFocusedElement.focus ===
-        "function"
-    ) {
-      lastFocusedElement.focus();
-    }
-
-
-    lastFocusedElement =
-      null;
-  }
-
-
-  /*
-   * Open buttons.
-   */
-  page$$(".case-open").forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const card =
-            button.closest(
-              ".case-card"
-            );
-
-          openModal(card);
-        }
-      );
-    }
-  );
-
-
-  /*
-   * Close controls.
-   */
-  modalClose?.addEventListener(
-    "click",
-    closeModal
-  );
-
-  modalBackdrop?.addEventListener(
-    "click",
-    closeModal
-  );
-
-  modalCTA?.addEventListener(
-    "click",
-    closeModal
-  );
-
-
-  /*
-   * Escape key.
-   */
-  document.addEventListener(
-    "keydown",
-    event => {
-
-      if (
-        event.key === "Escape" &&
-        modal.classList.contains(
-          "open"
-        )
-      ) {
-        closeModal();
-      }
-    }
-  );
+  });
 }
 
-
-/* =========================================================
-   INITIALIZE PAGE FEATURES
-========================================================= */
-
-function initPageFeatures() {
-
-  initPortfolioFilters();
-
-  initProjectPlanner();
-
-  initCaseStudyModal();
-
-  initContactForm();
-
-
-  console.log(
-    "Webcraft page.js initialized."
-  );
-}
-
-
-/* =========================================================
-   START
-========================================================= */
-
-if (
-  document.readyState ===
-  "loading"
-) {
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    initPageFeatures,
-    {
-      once: true
-    }
-  );
-
-} else {
-
-  initPageFeatures();
-
-}
+function initPageFeatures(){ initPortfolioFilters(); initProjectPlanner(); initCaseStudyModal(); initContactForm(); }
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initPageFeatures,{once:true}); else initPageFeatures();
