@@ -2288,14 +2288,3 @@ a, button, input, textarea, select { -webkit-tap-highlight-color: transparent; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
-
-
-/* Global social strip — uses the existing Webcraft visual system */
-.social-strip{background:var(--ink);color:#fff;border-bottom:1px solid rgba(255,255,255,.08);}
-.social-strip-inner{min-height:40px;display:flex;align-items:center;justify-content:flex-end;gap:18px;}
-.social-strip-label{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;opacity:.65;}
-.social-strip-links{display:flex;align-items:center;gap:12px;}
-.social-strip-links a{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-size:11px;font-weight:600;opacity:.82;transition:opacity .2s ease,color .2s ease;}
-.social-strip-links a:hover{opacity:1;color:var(--accent-light);}
-.social-strip-links svg{width:15px;height:15px;flex:none;}
-@media(max-width:640px){.social-strip-inner{justify-content:center;min-height:38px;}.social-strip-label{display:none;}.social-strip-links{gap:14px}.social-strip-links a span{display:none}.social-strip-links svg{width:17px;height:17px;}}
