@@ -773,3 +773,6 @@
 .contact-form-footer { align-items: end; }
 .contact-form-privacy { opacity:.72; }
 .form-honeypot { position:absolute !important; left:-10000px !important; width:1px !important; height:1px !important; overflow:hidden !important; }
+
+/* Blue/black form alignment */
+.contact-form-section input,.contact-form-section textarea,.contact-form-section select{background:#081523!important;color:var(--ink)!important;border-color:var(--line)!important}.contact-form-section input::placeholder,.contact-form-section textarea::placeholder{color:#62758d!important}.contact-form-section input:focus,.contact-form-section textarea:focus,.contact-form-section select:focus{border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(61,140,255,.12)!important}.contact-form-message.success{background:rgba(61,140,255,.09)!important;border-color:rgba(61,140,255,.3)!important}

@@ -1777,3 +1777,18 @@ transition: none;
 
 .page-cta { position: relative; overflow: hidden; }
 .page-cta::after { content:""; position:absolute; width:220px; height:220px; border:1px solid currentColor; border-radius:50%; right:-110px; top:50%; opacity:.08; pointer-events:none; }
+
+
+/* Blue/black page harmonisation */
+.page-hero,.page-hero-inner,.service-card,.faq-item,.contact-panel,.about-card,.process-stage{color:var(--ink)}
+.page-hero p,.service-card p,.faq-answer,.about-hero-text,.about-hero-side>p,.process-stage-content>p{color:var(--ink-soft)}
+.service-card,.faq-item,.about-card{background:var(--surface);border-color:var(--line)}
+
+/* Dark blue component pass */
+.page-hero{background:radial-gradient(circle at 80% 15%,rgba(61,140,255,.11),transparent 34%)}
+.page-hero-inner{border-color:var(--line)!important}
+.page-hero-note,.service-card,.faq-item,.faq-question,.faq-answer,.about-card,.service-feature,.service-list-card,.service-cta,.contact-panel{background:var(--surface)!important;border-color:var(--line)!important;color:var(--ink)}
+.page-hero-note p,.service-card p,.faq-answer,.service-list-card p,.service-feature p,.contact-panel p{color:var(--ink-soft)!important}
+.faq-question{color:var(--ink)!important}.faq-question:hover{background:var(--surface-soft)!important}
+.service-card:hover,.about-card:hover{border-color:rgba(61,140,255,.48)!important;background:#0d1c30!important}
+.process-stage:hover{background:rgba(17,35,58,.55)!important}.process-stage-list span{background:#0b1727!important;border-color:var(--line)!important;color:var(--muted)!important}
