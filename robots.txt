@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /pages/dashboard/
+Sitemap: https://webcraftboys.github.io/sitemap.xml
