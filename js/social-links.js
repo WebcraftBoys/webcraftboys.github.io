@@ -1,27 +1,21 @@
-"use strict";
-
-// Add Webcraft's real social URLs here. Leave a value blank to keep the icon inactive.
 window.WEBCRAFT_SOCIALS = {
   instagram: "",
   facebook: "",
-  x: "https://x.com/webcraftdevwork",
-  youtube: "https://www.youtube.com/@WebcraftBoys",
-  github: "https://github.com/WebcraftBoys/"
+  x: "",
+  youtube: "",
+  github: ""
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("[data-social]").forEach(link => {
-    const key = link.getAttribute("data-social");
-    const url = String(window.WEBCRAFT_SOCIALS?.[key] || "").trim();
+  const links = window.WEBCRAFT_SOCIALS || {};
+  document.querySelectorAll("[data-social]").forEach((el) => {
+    const key = el.getAttribute("data-social");
+    const url = links[key];
     if (url) {
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.removeAttribute("aria-disabled");
+      el.href = url;
+      el.hidden = false;
     } else {
-      link.href = "#";
-      link.setAttribute("aria-disabled", "true");
-      link.addEventListener("click", e => e.preventDefault());
+      el.hidden = true;
     }
   });
 });

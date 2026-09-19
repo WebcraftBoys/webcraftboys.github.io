@@ -2290,17 +2290,12 @@ a, button, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 }
 
 
-/* =========================================================
-   WEBCRAFT 2026 VISUAL SYSTEM — DEEP BLUE / BLACK
-========================================================= */
-:root{--bg:#050b14;--bg-soft:#08111e;--surface:#0b1626;--surface-soft:#0e1b2d;--ink:#f4f8ff;--ink-soft:#b6c5d8;--muted:#7f90a7;--muted-light:#9caec3;--line:#1a2a40;--line-dark:#2b405c;--accent:#3d8cff;--accent-light:#8fc4ff;--accent-soft:rgba(61,140,255,.12);--shadow-sm:0 8px 25px rgba(0,0,0,.18);--shadow-md:0 20px 55px rgba(0,0,0,.25);--shadow-lg:0 30px 90px rgba(0,0,0,.35)}
-body{background:var(--bg);color:var(--ink)}
-body::before{opacity:.025;background-image:radial-gradient(#8fc4ff .45px,transparent .45px)}
-.nav-wrap{background:rgba(5,11,20,.82);border-bottom:1px solid rgba(108,151,203,.12);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
-.nav{height:72px}.nav-links{gap:26px}.nav-links a{color:#91a2b8}.nav-links a:not(.nav-cta):hover,.nav-links a[aria-current="page"]{color:#fff}.nav-links a[aria-current="page"]::after{width:100%}.nav-cta{background:#f4f8ff;color:#06101e!important}.nav-cta b{color:#2f82ff}.brand{color:#f4f8ff}.brand>span>span{color:var(--accent)}
-.btn-dark{background:#f4f8ff;color:#06101e;box-shadow:0 12px 35px rgba(0,0,0,.24)}.btn-dark:hover{box-shadow:0 18px 42px rgba(24,110,255,.22)}.text-link{color:#b5c4d8;border-color:#30445f}.text-link:hover{color:#7db8ff;border-color:#3d8cff}
-.topbar{height:34px;border-bottom:1px solid rgba(108,151,203,.1);background:#030812}.topbar-inner{height:100%;display:flex;align-items:center;gap:10px}.topbar-label{color:#dce9f8;font-size:9px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase}.topbar-rule{width:28px;height:1px;background:#274363}.topbar-note{color:#6f829a;font-size:9px;letter-spacing:.2px}.social-links{display:flex;align-items:center;gap:6px;margin-left:auto}.social-link{display:grid;place-items:center;width:24px;height:24px;border:1px solid transparent;border-radius:7px;color:#7e91a9;text-decoration:none;transition:color .2s ease,border-color .2s ease,background .2s ease,transform .2s ease}.social-link svg{width:13px;height:13px}.social-link:hover{color:#8fc4ff;border-color:#203a59;background:#0a1728;transform:translateY(-1px)}.social-link[aria-disabled="true"]{opacity:.72}.social-link[aria-disabled="true"]:hover{color:#7e91a9;border-color:transparent;background:transparent;transform:none}
-.footer{background:#030811;color:#dbe7f5;border-top:1px solid var(--line)}.footer a{color:#8395ac}.footer a:hover{color:#fff}.footer p{color:#6f829a}.footer-bottom{border-top-color:#15263a;color:#64778f}
-.site-progress{background:#08111e}.site-progress span{background:linear-gradient(90deg,#2e79ff,#70b7ff)}.back-to-top{background:#0d1c2f;border-color:#27405e;color:#cfe3fa}.back-to-top:hover{background:#173251}
-.site-loader{background:#050b14;color:#fff}.loader-brand{color:#fff}.loader-grid i{background:#2f82ff}
-@media(max-width:768px){.topbar{height:32px}.topbar-note{display:none}.topbar-rule{display:none}.topbar-inner{padding-inline:20px}.nav{height:68px}.nav-wrap{position:fixed}.nav-links{background:#07101c;border-color:#1d334d;box-shadow:0 25px 70px rgba(0,0,0,.4)}.nav-links a{color:#a9b8ca}.nav-cta{color:#06101e!important}}
+/* Global social strip — uses the existing Webcraft visual system */
+.social-strip{background:var(--ink);color:#fff;border-bottom:1px solid rgba(255,255,255,.08);}
+.social-strip-inner{min-height:40px;display:flex;align-items:center;justify-content:flex-end;gap:18px;}
+.social-strip-label{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;opacity:.65;}
+.social-strip-links{display:flex;align-items:center;gap:12px;}
+.social-strip-links a{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-size:11px;font-weight:600;opacity:.82;transition:opacity .2s ease,color .2s ease;}
+.social-strip-links a:hover{opacity:1;color:var(--accent-light);}
+.social-strip-links svg{width:15px;height:15px;flex:none;}
+@media(max-width:640px){.social-strip-inner{justify-content:center;min-height:38px;}.social-strip-label{display:none;}.social-strip-links{gap:14px}.social-strip-links a span{display:none}.social-strip-links svg{width:17px;height:17px;}}

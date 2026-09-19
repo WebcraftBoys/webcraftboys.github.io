@@ -52,6 +52,3 @@
 .case-card { transition: opacity .2s ease, transform .2s ease; }
 .case-card.hidden { display:none !important; }
 .modal-panel { max-height: min(760px, calc(100vh - 48px)); overflow:auto; }
-
-/* Blue/black portfolio alignment */
-.filter:hover,.filter.active{background:#f4f8ff;color:#06101e;border-color:#f4f8ff}.visual-ledger{background:linear-gradient(135deg,#0d2038,#091523);color:#dcecff}.modal-panel{background:#0b1727;color:var(--ink);border-color:#23405f}.modal-panel>p{color:var(--ink-soft)}.modal-result{background:#101f32}.modal-close{border-color:#27415f}.modal-close:hover{background:#f4f8ff;color:#06101e}
