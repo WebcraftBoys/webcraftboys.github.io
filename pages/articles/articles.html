@@ -80,6 +80,31 @@
     }
   }
   </script>
+
+  <!-- Articles hub enhancements -->
+  <style>
+    .articles-hub .journal-intro{max-width:760px;margin:0 auto 2.25rem;text-align:center}
+    .articles-hub .journal-intro p{max-width:650px;margin:1rem auto 0;opacity:.82;line-height:1.75}
+    .articles-hub .topic-row{display:flex;justify-content:center;flex-wrap:wrap;gap:.6rem;margin:1.5rem auto 0}
+    .articles-hub .topic-pill{display:inline-flex;align-items:center;border:1px solid rgba(30,30,30,.16);border-radius:999px;padding:.48rem .85rem;font-size:.82rem}
+    .articles-hub .featured-article{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);gap:clamp(1.5rem,4vw,3.5rem);align-items:center;border:1px solid rgba(30,30,30,.13);border-radius:24px;padding:clamp(1.25rem,3vw,2.5rem);margin-bottom:2rem;overflow:hidden}
+    .articles-hub .featured-copy .article-meta{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;opacity:.72;font-size:.85rem}
+    .articles-hub .featured-copy h2{font-size:clamp(1.65rem,3.4vw,2.8rem);line-height:1.12;letter-spacing:-.035em;margin:0 0 1rem}
+    .articles-hub .featured-copy p{line-height:1.75;max-width:620px;opacity:.84}
+    .articles-hub .featured-note{min-height:220px;border-radius:18px;padding:clamp(1.25rem,3vw,2rem);display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,rgba(40,40,40,.06),rgba(40,40,40,.015));border:1px solid rgba(30,30,30,.08)}
+    .articles-hub .featured-note .note-mark{font-size:clamp(2.5rem,6vw,5rem);line-height:1;opacity:.65;font-family:Georgia,serif}
+    .articles-hub .featured-note p{font-size:1rem;line-height:1.6;margin:1rem 0 0;max-width:330px}
+    .articles-hub .article-card{transition:transform .2s ease,border-color .2s ease}
+    .articles-hub .article-card:hover{transform:translateY(-4px)}
+    .articles-hub .article-card h2{line-height:1.25}
+    .articles-hub .article-card p{line-height:1.7}
+    .articles-hub .article-card .article-meta{display:flex;gap:.55rem;flex-wrap:wrap}
+    .articles-hub .browse-note{max-width:820px;margin:2.5rem auto 0;text-align:center;line-height:1.75;opacity:.82}
+    .articles-hub .browse-note a{text-decoration:underline;text-underline-offset:3px}
+    @media(max-width:760px){.articles-hub .featured-article{grid-template-columns:1fr}.articles-hub .featured-note{min-height:150px}.articles-hub .journal-intro{text-align:left}.articles-hub .topic-row{justify-content:flex-start}}
+    @media(prefers-reduced-motion:reduce){.articles-hub .article-card{transition:none}.articles-hub .article-card:hover{transform:none}}
+  </style>
+
 </head>
 
 <body>
@@ -177,115 +202,33 @@
   </header>
 
   <!-- MAIN CONTENT -->
-  <main id="main-content">
+  <main id="main-content" class="articles-hub">
 
-    <!-- Hero -->
+    <!-- Editorial hero -->
     <section class="page-hero container">
-      <div class="page-hero-copy">
-
-        <span class="eyebrow">
-          <span></span>
-          Webcraft Journal
-        </span>
-
-        <h1>
-          Ideas that make your
-          <em>website work harder.</em>
-        </h1>
-
-        <p>
-          Practical guidance on websites, design, development, maintenance,
-          management and SEO — written for businesses that want a stronger
-          online presence.
-        </p>
-
+      <div class="page-hero-copy journal-intro">
+        <span class="eyebrow"><span></span> Webcraft Journal</span>
+        <h1>Ideas that make your <em>website work harder.</em></h1>
+        <p>Practical, straightforward guidance on business websites—from planning and design to improving trust, usability, visibility and enquiries.</p>
+        <div class="topic-row" aria-label="Article topics">
+          <span class="topic-pill">Business websites</span><span class="topic-pill">Website redesign</span><span class="topic-pill">Website costs</span><span class="topic-pill">Design &amp; growth</span>
+        </div>
       </div>
     </section>
 
+    <!-- Featured reading -->
+    <section class="section container" aria-labelledby="featured-reading-heading">
+      <div class="section-head"><div><span class="section-kicker">Start here</span><h2 id="featured-reading-heading">A good place to <em>begin.</em></h2></div><p>Is your current website helping your business—or quietly getting in the way?</p></div>
+      <article class="featured-article"><div class="featured-copy"><div class="article-meta"><span>Website redesign</span><span>·</span><span>8 min read</span></div><h2>7 Signs Your Business Website Needs a Redesign</h2><p>Use this checklist to spot common problems—from outdated visuals and poor mobile usability to unclear messaging and missed enquiries—and decide what your website needs next.</p><a class="read-more" href="/pages/articles/7-signs-business-website-needs-redesign.html">Read the redesign guide ↗</a></div><div class="featured-note" aria-label="Featured article takeaway"><span class="note-mark" aria-hidden="true">“</span><p>A website should make it easier for people to understand your business, trust it, and take the next step.</p></div></article>
+    </section>
     <!-- Articles -->
-    <section class="section container">
-
-      <div class="section-head">
-        <div>
-          <span class="section-kicker">Latest articles</span>
-          <h2>
-            Useful reads for
-            <em>business owners.</em>
-          </h2>
-        </div>
-
-        <p>
-          Clear answers, practical guidance and no unnecessary jargon.
-        </p>
-      </div>
-
+    <section class="section container" aria-labelledby="article-list-heading">
+      <div class="section-head"><div><span class="section-kicker">The journal</span><h2 id="article-list-heading">Useful reads for <em>business owners.</em></h2></div><p>Clear answers, practical guidance and no unnecessary jargon.</p></div>
       <div class="article-grid">
-
-        <!-- Article 01: Newest -->
-        <a class="article-card" href="/pages/articles/7-signs-business-website-needs-redesign.html">
-
-          <div class="article-meta">
-            <span>Website redesign</span>
-            <span>·</span>
-            <span>8 min read</span>
-          </div>
-
-          <h2>7 Signs Your Business Website Needs a Redesign</h2>
-
-          <p>
-            Learn how outdated design, poor mobile usability, slow loading,
-            confusing content and weak conversions could be holding your
-            business website back.
-          </p>
-
-          <span class="read-more">Read article ↗</span>
-
-        </a>
-
-        <!-- Article 02 -->
-        <a class="article-card" href="/pages/articles/business-needs-website-2026.html">
-
-          <div class="article-meta">
-            <span>Business websites</span>
-            <span>·</span>
-            <span>7 min read</span>
-          </div>
-
-          <h2>Why Your Business Needs a Website in 2026</h2>
-
-          <p>
-            Discover how a professional website helps businesses build trust,
-            improve visibility, explain their services and turn visitors
-            into enquiries.
-          </p>
-
-          <span class="read-more">Read article ↗</span>
-
-        </a>
-
-        <!-- Article 03 -->
-        <a class="article-card" href="/pages/articles/website-cost-2026.html">
-
-          <div class="article-meta">
-            <span>Business websites</span>
-            <span>·</span>
-            <span>8 min read</span>
-          </div>
-
-          <h2>How Much Does a Business Website Cost in 2026?</h2>
-
-          <p>
-            A practical guide to the factors that shape website cost,
-            from design and development to content, integrations,
-            maintenance and SEO.
-          </p>
-
-          <span class="read-more">Read article ↗</span>
-
-        </a>
-
+        <a class="article-card" href="/pages/articles/business-needs-website-2026.html"><div class="article-meta"><span>Business websites</span><span>·</span><span>7 min read</span></div><h2>Why Your Business Needs a Website in 2026</h2><p>Understand how a website can support visibility, credibility, customer questions and enquiries—and what social platforms alone may not provide.</p><span class="read-more">Read article ↗</span></a>
+        <a class="article-card" href="/pages/articles/website-cost-2026.html"><div class="article-meta"><span>Website planning</span><span>·</span><span>8 min read</span></div><h2>How Much Does a Business Website Cost in 2026?</h2><p>Explore the factors that shape a website budget, including scope, design, content, functionality, integrations, maintenance and SEO.</p><span class="read-more">Read article ↗</span></a>
       </div>
-
+      <p class="browse-note">Planning a new website or improving an existing one? Explore our <a href="/pages/services/services.html">website services</a>, browse our <a href="/pages/work/work.html">work and concepts</a>, or <a href="/pages/contact/contact.html">talk to Webcraft</a> about your project.</p>
     </section>
 
     <!-- CTA -->
