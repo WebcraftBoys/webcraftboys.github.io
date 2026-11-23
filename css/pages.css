@@ -1777,3 +1777,85 @@ transition: none;
 
 .page-cta { position: relative; overflow: hidden; }
 .page-cta::after { content:""; position:absolute; width:220px; height:220px; border:1px solid currentColor; border-radius:50%; right:-110px; top:50%; opacity:.08; pointer-events:none; }
+
+
+
+
+/* =========================================
+   WEBCRAFT ARTICLE READING LAYOUT
+========================================= */
+
+.article-content {
+  width: 100%;
+  max-width: 820px;
+  margin-inline: auto;
+  line-height: 1.85;
+  color: var(--text, #222);
+}
+
+.article-content .article-meta {
+  margin-bottom: 28px;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.article-content .article-intro {
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+.article-content h2 {
+  margin-top: 48px;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+.article-content p {
+  margin-bottom: 20px;
+}
+
+.article-content ul {
+  margin: 20px 0 28px;
+  padding-left: 24px;
+}
+
+.article-content li {
+  margin-bottom: 10px;
+}
+
+.article-content a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.article-related {
+  margin-top: 60px;
+  padding: 28px;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  border-radius: 16px;
+}
+
+.article-related h2 {
+  margin-top: 0;
+}
+
+.article-related p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .article-content {
+    font-size: 0.97rem;
+    line-height: 1.8;
+  }
+
+  .article-content h2 {
+    margin-top: 36px;
+  }
+
+  .article-related {
+    padding: 20px;
+    margin-top: 40px;
+  }
+}
